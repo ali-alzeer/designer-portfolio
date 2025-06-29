@@ -1,0 +1,187 @@
+<div class="flex flex-col justify-center items-center gap-5 pt-10">
+    
+    @if (adminStore.isAdmin()) {
+        
+        <div class="flex flex-col justify-center items-center">
+            <h1 class="font-cairo-black text-3xl text-primary-400 m-5">{{UI.welcome}}</h1>
+            
+            <div class="flex flex-col md:flex-row justify-center items-center p-2 m-5 gap-1 flex-wrap border-2 border-primary-950">
+                <button [disabled]="worksPage" (click)="ShowWorksPage()" class="w-36 text-center text-nowrap flex-1 p-3 font-cairo-semibold text-lg bg-purple-700 text-white disabled:bg-primary-disabled disabled:text-gray-500">{{ UI.works }}</button>
+                <button [disabled]="toolsPage" (click)="ShowToolsPage()" class="w-36 text-center text-nowrap flex-1 p-3 font-cairo-semibold text-lg bg-purple-700 text-white disabled:bg-primary-disabled disabled:text-gray-500">{{ UI.tools }}</button>
+                <button [disabled]="accountPage" (click)="ShowAccountPage()" class="w-36 text-center text-nowrap flex-1 p-3 font-cairo-semibold text-lg bg-purple-700 text-white disabled:bg-primary-disabled disabled:text-gray-500">{{ UI.account }}</button>
+            </div>
+
+            @if (worksPage) {
+                <div class="flex flex-col justify-center items-center">
+                    <div class="flex flex-col justify-center items-center p-3 gap-3">
+                        @if(adding){
+                            <app-form-add-work></app-form-add-work>
+                            @if (!worksStore.isLoading()) {
+                                <button
+                                class="border-[1px] text-white border-white w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] bg-transparent border-primary text-primary focus:ring-4 focus:ring-gray-100"
+                                type="reset"
+                                (click)="CancelAdding()"
+                              >
+                                {{UI.cancel}}
+                              </button>
+                            }
+                        }
+                        <!-- @if(updating){
+                            <app-form-update-work></app-form-update-work>
+                            @if (!worksStore.isLoading()) {
+                                <button
+                                class="border-[1px] border-primary-950 w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] bg-transparent border-primary text-primary focus:ring-4 focus:ring-gray-100"
+                                type="reset"
+                                (click)="CancelUpdating()"
+                              >
+                                {{UI.cancel}}
+                              </button>
+                            }
+                        } -->
+                        @else if(!adding){
+                            <button
+                            class="flex justify-center items-center text-center w-full flex-1 text-nowrap disabled:cursor-default disabled:bg-primary-disabled disabled:text-gray-500 rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-primary-500 hover:bg-primary-600 focus:bg-primary-700 border-primary-500 text-white focus:ring-4 focus:ring-primary-200 hover:ring-4 hover:ring-primary-100 transition-all duration-300"
+                            type="button"
+                            (click)="StartAdding()"
+                            >
+                                <div class="flex gap-2 items-center">{{UI.add}}</div>
+                            </button>
+                        }
+                    </div>
+    
+                    <hr class="w-full my-10 h-2 bg-primary-800">
+    
+                    <h1 class="font-cairo-bold text-2xl text-white m-5">{{UI.works}}</h1>
+                    <div class="flex flex-col justify-center items-center m-5 p-3">
+                        <app-works></app-works>
+                    </div>
+                </div>
+            }
+            @else if (toolsPage) {
+                <div class="flex flex-col justify-center items-center">
+                    <div class="flex flex-col justify-center items-center p-3 gap-3">
+                        @if(toolAdding){
+                            <app-form-add-tool></app-form-add-tool>
+                            @if (!toolsStore.isLoading()) {
+                                <button
+                                class="border-[1px] border-white text-white w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] bg-transparent border-primary text-primary focus:ring-4 focus:ring-gray-100"
+                                type="reset"
+                                (click)="CancelToolAdding()"
+                              >
+                                {{UI.cancel}}
+                              </button>
+                            }
+                        }
+                        <!-- @if(toolUpdating){
+                            <app-form-update-tool></app-form-update-work>
+                            @if (!worksStore.isLoading()) {
+                                <button
+                                class="border-[1px] border-primary-950 w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] bg-transparent border-primary text-primary focus:ring-4 focus:ring-gray-100"
+                                type="reset"
+                                (click)="CancelUpdating()"
+                              >
+                                {{UI.cancel}}
+                              </button>
+                            }
+                        } -->
+                        @else if(!toolAdding){
+                            <button
+                            class="flex justify-center items-center text-center w-full flex-1 text-nowrap disabled:cursor-default disabled:bg-primary-disabled disabled:text-gray-500 rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-primary-500 hover:bg-primary-600 focus:bg-primary-700 border-primary-500 text-white focus:ring-4 focus:ring-primary-200 hover:ring-4 hover:ring-primary-100 transition-all duration-300"
+                            type="button"
+                            (click)="StartToolAdding()"
+                            >
+                                <div class="flex gap-2 items-center">{{UI.toolAdd}}</div>
+                            </button>
+                        }
+                    </div>
+    
+                    <hr class="w-full my-10 h-2 bg-primary-800">
+    
+                    <h1 class="font-cairo-bold text-2xl text-white m-5">{{UI.tools}}</h1>
+                    <div class="flex flex-col justify-center items-center m-5 p-3">
+                        <app-tools></app-tools>
+                    </div>
+                </div>
+            }
+            @else if (accountPage) {
+                <div class="flex flex-col justify-center items-center">
+                    <div class="flex flex-col justify-center items-center p-3 gap-3">
+                        @if(changeAdminData){
+                            <app-form-change-admin-data></app-form-change-admin-data>
+                            @if (!adminStore.isLoading()) {
+                                <button
+                                class="border-[1px] border-white text-white w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] bg-transparent border-primary text-primary focus:ring-4 focus:ring-gray-100"
+                                type="reset"
+                                (click)="CancelChangingData()"
+                              >
+                                {{UI.cancel}}
+                              </button>
+                            }
+                        }
+                        @else if(!changeAdminData){
+                            <button
+                            class="flex justify-center items-center text-center w-full flex-1 text-nowrap disabled:cursor-default disabled:bg-primary-disabled disabled:text-gray-500 rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-primary-500 hover:bg-primary-600 focus:bg-primary-700 border-primary-500 text-white focus:ring-4 focus:ring-primary-200 hover:ring-4 hover:ring-primary-100 transition-all duration-300"
+                            type="button"
+                            (click)="StartChangingData()"
+                            >
+                                <div class="flex gap-2 items-center">{{UI.changeData}}</div>
+                            </button>
+                        }
+
+                        @if(updateMainImage){
+                            <app-form-update-mainimage></app-form-update-mainimage>
+                            @if (!adminStore.isLoading()) {
+                                <button
+                                class="border-[1px] border-white text-white w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] bg-transparent border-primary text-primary focus:ring-4 focus:ring-gray-100"
+                                type="reset"
+                                (click)="CancelUpdatingImage()"
+                              >
+                                {{UI.cancel}}
+                              </button>
+                            }
+                        }
+                        @else if(!updateMainImage){
+                            <button
+                            class="flex justify-center items-center text-center w-full flex-1 text-nowrap disabled:cursor-default disabled:bg-primary-disabled disabled:text-gray-500 rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-primary-500 hover:bg-primary-600 focus:bg-primary-700 border-primary-500 text-white focus:ring-4 focus:ring-primary-200 hover:ring-4 hover:ring-primary-100 transition-all duration-300"
+                            type="button"
+                            (click)="StartUpdatingImage()"
+                            >
+                                <div class="flex gap-2 items-center">{{UI.UpdateImage}}</div>
+                            </button>
+                        }
+                    </div>
+    
+                    <div class="mb-10">
+                        <button
+                                class="border-[1px] border-red-950 bg-red-800 text-white w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border-primary focus:ring-4 focus:ring-gray-100"
+                                type="reset"
+                                (click)="SignOut()"
+                              >
+                                {{UI.signout}}
+                              </button>
+                    </div>
+    
+                </div>
+            }
+
+        </div>
+    }
+    @else {
+
+        <div class="min-h-screen flex flex-col justify-center items-center m-5">
+            <app-warning></app-warning>
+        </div>
+        <div class="min-h-screen flex flex-col justify-center items-center gap-3 m-5">
+            @if (adminStore.isLoading()) {
+                <h1 class="flex flex-col justify-center items-center font-cairo-black p-5 border-[10px] w-20 h-20 border-t-primary-950 border-r-primary-950 border-transparent rounded-full text-center animate-spin"></h1>
+        }
+        @else{
+            @if (adminStore.error() !== null) {
+                <h1 class="p-4 m-4 bg-red-200 text-red-950 text-center rounded-lg border-2 border-red-950 font-semibold">{{ adminStore.error() }}</h1>
+            }
+            <app-form-admin></app-form-admin>
+        }
+        </div>
+        
+    }
+</div>

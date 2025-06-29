@@ -1,0 +1,17 @@
+<div class="container1 font-sans">
+    <label class="switch">
+      <input (change)="OnTypeChange()" #TypeInput type="checkbox" />
+      <span class="slider">
+        @if (Value === "Image") {
+            <span class="title">{{UI.ImageText}}</span>
+        }
+        @else if (Value === "Video") {
+            <span class="title">{{UI.VideoText}}</span>
+        }
+        <span class="ball">
+          
+        </span>
+      </span>
+    </label>
+  </div>
+  

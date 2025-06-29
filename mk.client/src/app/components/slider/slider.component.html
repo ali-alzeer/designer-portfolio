@@ -1,0 +1,57 @@
+<div class="min-h-screen text-white flex justify-center items-center flex-col">
+    <div>
+        <div class="my-10 flex justify-center items-center text-4xl text-white gap-10">
+            <button [disabled]="currentIndex === 0" (click)="PrevoiusWork()" class="disabled:bg-slate-800 disabled:text-gray-600 rounded-lg p-4 bg-primary-700"><fa-icon [icon]="faArrowLeft"></fa-icon></button>
+            <button [disabled]="DisableNext" (click)="NextWork()" class="disabled:bg-slate-800 disabled:text-gray-600 rounded-lg p-4 bg-primary-700"><fa-icon [icon]="faArrowRight"></fa-icon></button>
+        </div>
+    </div>
+
+    <div class="flex justify-center items-center">
+        @if(worksStore.works()[currentIndex].type === "image"){
+            <img [src]="worksStore.works()[currentIndex].publicWorkMediaUrl" alt="" (error)="ImageNotFound = true" class="flex-1 max-h-[70vh]">
+            @if (ImageNotFound || worksStore.works()[currentIndex].publicWorkMediaUrl === "") {
+                <object class="bg-primary-700 flex justify-center items-center text-center text-2xl text-white flex-1"> <fa-icon [icon]="faImage"></fa-icon> </object>
+            }
+        }
+        @else if(worksStore.works()[currentIndex].type === "video"){
+            @if (this.mediaService.extractYouTubeId(worksStore.works()[currentIndex].publicWorkMediaUrl).id !== "") {
+                @if(this.mediaService.extractYouTubeId(worksStore.works()[currentIndex].publicWorkMediaUrl).isShort){
+                    <youtube-player [width]="windowHeight * 0.7 * 9 / 16" [height]="windowHeight * 0.7" #player [videoId]="this.mediaService.extractYouTubeId(worksStore.works()[currentIndex].publicWorkMediaUrl).id" class="flex-1 object-cover"></youtube-player>
+                }
+                @else {
+                    <youtube-player [width]="windowWidth * 0.7" [height]="windowWidth * 0.7 * 9 / 16" #player [videoId]="this.mediaService.extractYouTubeId(worksStore.works()[currentIndex].publicWorkMediaUrl).id" class="flex-1 object-cover"></youtube-player>
+                }
+            }
+            @else {
+                <object [width]="windowWidth" class="bg-primary-700 flex justify-center items-center text-center text-2xl text-white flex-1"> <fa-icon [icon]="faVideo"></fa-icon> </object>
+            }
+        }
+    </div>
+
+    <div class="flex flex-col justify-center items-center gap-10 mt-10">
+        <div class="gap-3 flex flex-col justify-center items-center">
+            <h1 [class.font-ethnocentric]="this.language === 0" [class.font-tajawal-black]="this.language === 1" class=" text-2xl text-transparent bg-gradient-to-tl from-primary-gradientFrom to-primary-gradientTo bg-clip-text">{{ UI.title }}</h1>
+            <p class="font-cairo-medium text-white text-wrap text-center">{{ this.worksStore.works()[currentIndex].title }}</p>
+        </div>
+        <div class="gap-3 flex flex-col justify-center items-center">
+            <h1 [class.font-ethnocentric]="this.language === 0" [class.font-tajawal-black]="this.language === 1" class="text-2xl text-transparent bg-gradient-to-tl from-primary-gradientFrom to-primary-gradientTo bg-clip-text">{{ UI.description }}</h1>
+            <p class="font-cairo-medium text-white text-wrap text-center">{{ this.worksStore.works()[currentIndex].description }}</p>
+        </div>
+
+        @if (this.worksStore.works()[currentIndex].toolsIds !== undefined && this.worksStore.works()[currentIndex].toolsIds!.length > 0) {
+            <div class="mb-10 gap-3 flex flex-col justify-center items-center">
+                <h1 [class.font-ethnocentric]="this.language === 0" [class.font-tajawal-black]="this.language === 1" class="text-2xl text-transparent bg-gradient-to-tl from-primary-gradientFrom to-primary-gradientTo bg-clip-text">{{ UI.tools }}</h1>
+                <div class="flex justify-center items-center text-center gap-3 py-3 flex-wrap">
+
+                    @for (tool of toolsStore.GetToolsForWork(this.worksStore.works()[currentIndex].toolsIds!) ; track $index) {
+                        <img [src]="tool.publicToolImageUrl" alt="" class="drop-shadow-glow max-w-[50px]">
+                    }
+                </div>
+                </div>    
+
+            }
+    </div>
+
+
+
+</div>

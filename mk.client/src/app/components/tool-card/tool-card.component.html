@@ -1,0 +1,20 @@
+@if (this.tool.id !== 0) {
+    <div class="bg-primary-400 flex flex-col text-center p-1">
+        <img [src]="tool.publicToolImageUrl" alt="" (error)="ImageNotFound = true" class="max-w-[150px] bg-primary-700">
+        @if (ImageNotFound || tool.publicToolImageUrl === "") {
+            <object [width]="width" [height]="height" class="bg-primary-700 flex justify-center items-center text-center text-2xl text-white"> <fa-icon [icon]="faTools"></fa-icon> </object>
+        }
+        
+        <div class="flex justify-center items-center text-center bg-primary-950 text-white font-cairo-semibold text-xl py-4 overflow-hidden">
+            <h1 class="font-bold text-center overflow-hidden text-wrap max-w-[200px] md:max-w-[350px] lg:md:max-w-[550px]">{{ tool.title | titlecase }}</h1>
+        </div>
+
+        @if (adminStore.isAdmin()) {
+            <div class="flex justify-center items-center text-center gap-1 bg-primary-400">
+                <!-- <button (click)="StartUpdating(work)" class="py-3 flex-1 bg-primary-700 text-white text-center"> <fa-icon [icon]="faEdit"></fa-icon> </button> -->
+                <button (click)="StartDeleting(tool)" class="py-3 flex-1 bg-primary-700 text-white text-center"> <fa-icon [icon]="faTrash"></fa-icon> </button>
+            </div>
+        }
+        
+    </div>
+}

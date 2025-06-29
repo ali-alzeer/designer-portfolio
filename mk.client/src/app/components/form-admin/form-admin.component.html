@@ -1,0 +1,98 @@
+<form [formGroup]="SigninForm" class="font-cairo-regular mb-10 max-w-[50rem] flex flex-col justify-center items-center bg-white p-10 rounded-lg shadow-lg">
+      <div class="flex mb-10">
+        <h1 class="text-primary-950 font-cairo-black text-3xl">{{UI.Title}}</h1>
+      </div>
+      
+      <div class="w-full grid grid-cols-1 gap-6 mb-10">
+        <div id="input" class="relative w-full">
+          <input
+            #Username
+          formControlName="Username"
+            [ngClass]="{ 'text-right' : Language === 1 }"
+            dir="{{ Language === 1 ? 'rtl' : 'ltr' }}"
+            type="email"
+            id="floating_outlined1"
+            class="block w-full text-sm h-[50px] px-4 text-primary-900 bg-white rounded-[8px] border border-primary-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap"
+            placeholder="{{UI.Username}}"
+            value=""
+          />
+          <label
+            dir="{{ Language === 1 ? 'rtl' : 'ltr' }}"
+            for="floating_outlined1"
+            class="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] duration-300 transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white disabled:bg-gray-50 px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-tranprimary-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem] left-2 right-auto rtl:-right-2 rtl:left-auto"
+          >
+            {{UI.Username}}
+          </label>
+        </div>
+    
+        <div id="input" class="relative w-full">
+          <input
+            #Email
+          formControlName="Email"
+            [ngClass]="{ 'text-right' : Language === 1 }"
+            dir="{{ Language === 1 ? 'rtl' : 'ltr' }}"
+            type="email"
+            id="floating_outlined3"
+            class="block w-full text-sm h-[50px] px-4 text-primary-900 bg-white rounded-[8px] border border-primary-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap"
+            placeholder="{{UI.Email}}"
+            value=""
+          />
+          <label
+            dir="{{ Language === 1 ? 'rtl' : 'ltr' }}"
+            for="floating_outlined3"
+            class="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] duration-300 transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white disabled:bg-gray-50 px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-tranprimary-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem] left-2 right-auto rtl:-right-2 rtl:left-auto"
+          >
+            {{UI.Email}}
+          </label>
+        </div>
+    
+        <div id="input" class="relative w-full flex flex-col justify-center items-center">
+          <input
+            #Password
+            formControlName="Password"
+            [ngClass]="{ 'text-right' : Language === 1 }"
+            dir="{{ Language === 1 ? 'rtl' : 'ltr' }}"
+            type="password"
+            id="floating_outlined4"
+            class="z-[9] block w-full text-sm h-[50px] px-4 text-primary-900 bg-white rounded-[8px] border border-primary-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap"
+            placeholder="{{UI.Password}}"
+            value=""
+          />
+          <label
+            dir="{{ Language === 1 ? 'rtl' : 'ltr' }}"
+            for="floating_outlined4"
+            class="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] duration-300 transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white disabled:bg-gray-50 px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-tranprimary-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem] left-2 right-auto rtl:-right-2 rtl:left-auto"
+          >
+            {{UI.Password}}
+          </label>
+          <label
+            (click)="ShowPassword()"
+            class="cursor-pointer absolute -bottom-6 rounded-b-lg z-[1] pt-3 pb-1 bg-primary-200 text-xs w-full text-center self-center"
+            >
+            {{ ShowPasswordText }}
+          </label>
+          
+        </div>
+      </div>
+    
+      <div class="sm:flex flex gap-4">
+        <button
+        #SigninButton
+          [disabled]="!SigninForm.valid"
+          class="text-nowrap disabled:cursor-default disabled:bg-primary-disabled disabled:text-gray-500 w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-primary-500 hover:bg-primary-600 focus:bg-primary-700 border-primary-500-primary- text-white focus:ring-4 focus:ring-primary-200 hover:ring-4 hover:ring-primary-100 transition-all duration-300"
+          type="button"
+          (click)="Signin()"
+        >
+          <div class="flex gap-2 items-center">{{UI.Save}}</div>
+        </button>
+        <button
+          class="w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-transparent border-primary text-primary focus:ring-4 focus:ring-gray-100"
+          type="reset"
+          (click)="Reset()"
+        >
+          {{UI.Reset}}
+        </button>
+      </div>
+
+    </form>
+    

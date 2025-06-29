@@ -1,0 +1,85 @@
+/* From Uiverse.io by Na3ar-17 */ 
+:root{
+    --primary : #3b0764
+  }
+  
+  .container1 {
+      font-family: cairo;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      box-sizing: border-box;
+      color: #fff;
+    }
+    
+    .switch {
+      font-size: 1rem;
+      position: relative;
+      display: inline-block;
+      width: 9rem;
+      height: 2.6em;
+    }
+    
+    .switch input {
+      display: none;
+      opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      
+      .switch input:checked + .slider .ball {
+        background-color: #3b0764;  
+      }
+       
+      .switch input:checked + .slider {
+        background-color: white;
+        color: #3b0764;
+      }
+      
+      /* .switch input:focus + .slider {
+        box-shadow: 10px 10px 100px #7f8996;
+      }
+       */
+       .switch input:checked + .slider .ball {
+        left: 72%;
+        transform: rotate(360deg);
+        box-shadow: none;
+        /* outline: 6px solid rgba(255, 255, 255, 0.278); */
+      }
+      
+      .switch .slider {
+        border: 1px solid #3b0764;
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #3b0764;
+        transition: all 0.4s;
+        border-radius: 30px;
+      }
+      
+      .switch .slider .title {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-40%, -60%);
+        font-weight: 600;
+        transition: all 0.4s;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      
+      .switch .slider .ball {
+        background-color: #fff;
+        height: 2.6rem;
+        width: 2.6rem;
+        border-radius: 50%;
+        position: absolute;
+        transition: 0.4s;
+        left: -.5px;
+        top: -.5px;
+      }

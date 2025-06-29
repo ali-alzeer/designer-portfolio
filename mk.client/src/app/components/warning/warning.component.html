@@ -1,0 +1,11 @@
+    <div class="text-center max-w-72 md:max-w-96 border-2 border-red-800 rounded-lg">
+        <div class="p-5 bg-red-800 text-white font-bold text-3xl rounded-t-md">
+            {{ UI.title }}
+        </div>
+        <div class=" bg-red-500 flex flex-col justify-center items-center gap-3 p-3 rounded-b-md">
+            <p class="font-medium text-white">{{ UI.info }}</p>
+            <fa-icon [icon]="faArrowDown" class="animate-bounce text-3xl text-white"></fa-icon>
+            <button (click)="Return()" class="p-5 m-2 bg-white text-red-950 font-bold rounded-lg">{{ UI.button }}</button>
+        </div>
+    </div>
+    

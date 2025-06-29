@@ -1,0 +1,20 @@
+<div>
+    <form [formGroup]="addForm" (ngSubmit)="onAdd()">
+        <input type="text" formControlName="title">
+    </form>
+
+    <div>Total : {{ store.postsCount() }}</div>
+
+    @if (store.isLoading()) {
+        <div>LOADING</div>
+    }
+    @if(store.error()){
+        <div>{{ store.error() }}</div>
+    }
+
+    @for (post of store.posts(); track $index) {
+        <div>
+            {{ post.title }} <span (click)="store.remove(post.id)"> X</span>
+        </div>
+    }
+</div>

@@ -1,0 +1,89 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: "cairo-black";
+    src: url("../public/assets/fonts/cairo/Cairo-Black.ttf");
+}
+
+@font-face {
+    font-family: "cairo-extrabold";
+    src: url("../public/assets/fonts/cairo/Cairo-ExtraBold.ttf");
+}
+
+@font-face {
+    font-family: "cairo-bold";
+    src: url("../public/assets/fonts/cairo/Cairo-Bold.ttf");
+}
+
+@font-face {
+    font-family: "cairo-semibold";
+    src: url("../public/assets/fonts/cairo/Cairo-SemiBold.ttf");
+}
+
+@font-face {
+    font-family: "cairo-medium";
+    src: url("../public/assets/fonts/cairo/Cairo-Medium.ttf");
+}
+
+@font-face {
+    font-family: "cairo-regular";
+    src: url("../public/assets/fonts/cairo/Cairo-Regular.ttf");
+}
+
+@font-face {
+    font-family: "cairo-light";
+    src: url("../public/assets/fonts/cairo/Cairo-Light.ttf");
+}
+
+@font-face {
+    font-family: "cairo-extralight";
+    src: url("../public/assets/fonts/cairo/Cairo-ExtraLight.ttf");
+}
+
+@font-face {
+    font-family: "ethnocentric";
+    src: url("../public/assets/fonts/ethnocentric/ethnocentric.otf");
+}
+
+
+@font-face {
+    font-family: "ethnocentric-italic";
+    src: url("../public/assets/fonts/ethnocentric/ethnocentric-italic.otf");
+}
+
+
+@font-face {
+    font-family: "tajawal-extralight";
+    src: url("../public//assets/fonts/tajawal/Tajawal-ExtraLight.ttf");
+}
+@font-face {
+    font-family: "tajawal-light";
+    src: url("../public//assets/fonts/tajawal/Tajawal-Light.ttf");
+}
+@font-face {
+    font-family: "tajawal-regular";
+    src: url("../public//assets/fonts/tajawal/Tajawal-Regular.ttf");
+}
+@font-face {
+    font-family: "tajawal-medium";
+    src: url("../public//assets/fonts/tajawal/Tajawal-Medium.ttf");
+}
+@font-face {
+    font-family: "tajawal-bold";
+    src: url("../public//assets/fonts/tajawal/Tajawal-Bold.ttf");
+}
+@font-face {
+    font-family: "tajawal-extrabold";
+    src: url("../public//assets/fonts/tajawal/Tajawal-ExtraBold.ttf");
+}
+@font-face {
+    font-family: "tajawal-black";
+    src: url("../public//assets/fonts/tajawal/Tajawal-Black.ttf");
+}
+
+html{
+    scroll-behavior: smooth;
+}

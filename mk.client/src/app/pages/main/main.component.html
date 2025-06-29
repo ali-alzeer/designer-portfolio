@@ -1,0 +1,174 @@
+<div class="font-ethnocentric flex justify-center items-center flex-col">
+  <!-- <nav [class.font-ethnocentric]="language === 0" [class.font-tajawal-black]="language === 1" class="z-50 sticky top-20 w-full bg-gradient-to-tl from-primary-gradientFrom to-primary-gradientTo text-white p-5">
+		<ul [class.flex-row]="language === 0" [class.flex-row-reverse]="language === 1" class="hidden md:flex md:justify-center md:items-center md:gap-10">
+			<li (click)="HOME()" class="cursor-pointer">{{ UI.HOME }}</li>
+			<a href="#about"><li class="cursor-pointer">{{ UI.ABOUT }}</li></a>
+			<a href="#gallery"><li class="cursor-pointer">{{ UI.GALLERY }}</li></a>
+			<a href="#contact"><li class="cursor-pointer">{{ UI.CONTACT }}</li></a>
+		</ul>
+		<ul class="text-3xl flex justify-center items-center gap-10 md:hidden">
+			<li class="cursor-pointer"><fa-icon [icon]="faHouse"></fa-icon></li>
+			<a href="#about"><li class="cursor-pointer"><fa-icon [icon]="faInfo"></fa-icon></li></a>
+			<a href="#gallery"><li class="cursor-pointer"><fa-icon [icon]="faImages"></fa-icon></li></a>
+			<a href="#contact"><li class="cursor-pointer"><fa-icon [icon]="faEnvelope"></fa-icon></li></a>
+		</ul>
+	</nav> -->
+  <div></div>
+  <main
+    dir="{{ language === 1 ? 'rtl' : 'ltr' }}"
+    class="flex max-w-[1920px] min-h-96 md:min-h-[35rem] px-[10rem] w-full text-white py-10"
+  >
+    <div
+      class="w-full flex justify-between items-center flex-col-reverse xl:flex-row gap-36 mt-32 mb-32 xl:mt-20"
+    >
+      @if (language === 0) {
+      <img
+        class="min-w-[250px] md:w-[30rem]"
+        [src]="'assets/imgs/maintitleEN.png'"
+        alt=""
+      />
+      } @else if(language === 1){
+      <img
+        class="min-w-[250px] md:w-[30rem]"
+        [src]="'assets/imgs/maintitleAR.png'"
+        alt=""
+      />
+      }
+
+      <div class="animate-glow-shadow rounded-full">
+        <img
+          class="min-w-[250px] md:w-[25rem] min-h-[250px] md:h-[25rem] rounded-full border-[10px] border-primary-600"
+          src="{{ adminImage }}"
+          alt=""
+        />
+      </div>
+    </div>
+  </main>
+
+  <div
+    id="about"
+    dir="{{ language === 1 ? 'rtl' : 'ltr' }}"
+    [ngClass]="{ 'lg:flex-reverse': language === 1 }"
+    class="lg:flex-row w-full flex justify-between items-center flex-col gap-36 mt-32 mb-32 xl:mt-20 max-w-[1920px] min-h-96 text-white py-10 px-10 md:px-[15rem] text-wrap text-2xl 2xl:text-4xl"
+  >
+    @if (language === 0) {
+    <div>
+      <h1 class="font-ethnocentric text-3xl">
+        <span
+          class="bg-gradient-to-tl from-primary-gradientFrom to-primary-gradientTo bg-clip-text text-transparent text-3xl"
+          >A</span
+        >BOUT
+      </h1>
+      <p class="font-cairo-medium">
+        My name is
+        <span
+          class="bg-gradient-to-tl from-primary-gradientTo to-primary-300 bg-clip-text text-center rounded-md text-transparent"
+          >Mohammad Al-Khaled</span
+        >
+      </p>
+      <p class="font-cairo-medium">
+        I'm a passtionate and creative
+        <span
+          class="bg-gradient-to-tl from-primary-gradientTo to-primary-300 bg-clip-text text-center rounded-md text-transparent"
+          >graphic designer</span
+        >
+        and
+        <span
+          class="bg-gradient-to-tl from-primary-gradientTo to-primary-300 bg-clip-text text-center rounded-md text-transparent"
+          >video editor</span
+        >
+      </p>
+      <p class="font-cairo-medium">I pay attention to details</p>
+      <p class="font-cairo-medium">
+        I understand what clients want and I give them exactly what they need
+      </p>
+      <p class="font-cairo-medium">Check out my gallery down below</p>
+    </div>
+
+    } @else if(language === 1){
+    <div>
+      <h1 class="font-tajawal-black text-4xl">حول</h1>
+      <p class="font-cairo-medium">
+        اسمي
+        <span
+          class="bg-gradient-to-tl from-primary-gradientTo to-primary-300 bg-clip-text text-center rounded-md text-transparent"
+          >محمد الخالد</span
+        >
+      </p>
+      <p class="font-cairo-medium">
+        أنا
+        <span
+          class="bg-gradient-to-tl from-primary-gradientTo to-primary-300 bg-clip-text text-center rounded-md text-transparent"
+          >مصمم جرافيك</span
+        >
+        و
+        <span
+          class="bg-gradient-to-tl from-primary-gradientTo to-primary-300 bg-clip-text text-center rounded-md text-transparent"
+          >محرر فيديو</span
+        >
+        شغوف ومبدع
+      </p>
+      <p class="font-cairo-medium">أهتم بالتفاصيل</p>
+      <p class="font-cairo-medium">أفهم ما يريده العملاء وأعطيهم ما يحتاجون</p>
+      <p class="font-cairo-medium">تصفح معرض أعمالي في الأسفل</p>
+    </div>
+    }
+
+    <img
+      class="min-w-[250px] w-[30rem] animate-scale-glow"
+      [src]="'assets/imgs/logos.png'"
+      alt=""
+    />
+  </div>
+
+  <div id="gallery" class="max-w-[1920px] mb-60">
+    @if(language === 0){
+    <h1
+      class="drop-shadow-glow text-white text-4xl text-center font-ethnocentric 2xl:text-4xl"
+    >
+      MY GALLERY
+    </h1>
+
+    } @else if(language === 1){
+    <h1
+      class="drop-shadow-glow text-white text-4xl text-center font-tajawal-black 2xl:text-4xl"
+    >
+      المعرض
+    </h1>
+
+    }
+    <div>
+      <app-works-to-show></app-works-to-show>
+    </div>
+  </div>
+
+  <div
+    id="contact"
+    dir="{{ language === 1 ? 'rtl' : 'ltr' }}"
+    class="w-full flex justify-center gap-20 items-center flex-col xl:mt-20 max-w-[1920px] min-h-96 text-white mb-[10rem] py-10 px-10 md:px-[15rem] text-wrap 2xl:text-4xl"
+  >
+    @if(language === 0){
+    <h1
+      class="text-4xl drop-shadow-glow text-white text-center font-ethnocentric 2xl:text-4xl"
+    >
+      CONTACT ME
+    </h1>
+
+    } @else if(language === 1){
+    <h1
+      class="text-4xl drop-shadow-glow text-white text-center font-tajawal-black 2xl:text-4xl"
+    >
+      تواصل معي
+    </h1>
+
+    }
+
+    <a [href]="'mailto:' + adminEmail"
+      ><h1
+        class="font-cairo-black drop-shadow-glow bg-gradient-to-tl from-primary-gradientFrom to-primary-gradientTo p-6 rounded-full text-lg md:text-3xl"
+      >
+        {{ adminEmail }}
+      </h1></a
+    >
+  </div>
+</div>

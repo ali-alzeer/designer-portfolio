@@ -1,0 +1,37 @@
+@if (this.work.id !== 0) {
+    @if(work.type === "image"){
+        <img [id]="work.id" (click)="ShowSlider($event)" [src]="work.publicWorkMediaUrl" alt="" (error)="ImageNotFound = true" [width]="width" class="flex-1 object-cover cursor-pointer hover:filter hover:saturate-200 hover:brightness-125 transition-all">
+        @if (ImageNotFound || work.publicWorkMediaUrl === "") {
+            <object [width]="width" class="bg-primary-700 flex justify-center items-center text-center text-2xl text-white flex-1"> <fa-icon [icon]="faImage"></fa-icon> </object>
+        }
+    }
+    @else if(work.type === "video"){
+        @if (this.mediaService.extractYouTubeId(work.publicWorkMediaUrl).id !== "") {
+            @if(this.mediaService.extractYouTubeId(work.publicWorkMediaUrl).isShort){
+                <youtube-player [id]="work.id" (click)="ShowSlider($event)" [width]="width" #player [videoId]="this.mediaService.extractYouTubeId(work.publicWorkMediaUrl).id" class="cursor-pointer flex-1 hover:filter hover:saturate-200 hover:brightness-125 transition-all"></youtube-player>
+            }
+            @else {
+                <youtube-player [id]="work.id" (click)="ShowSlider($event)" [width]="width" #player [videoId]="this.mediaService.extractYouTubeId(work.publicWorkMediaUrl).id" class="cursor-pointer flex-1 hover:filter hover:saturate-200 hover:brightness-125 transition-all"></youtube-player>
+            }
+        }
+        @else {
+            <object [width]="width" class="bg-primary-700 flex justify-center items-center text-center text-2xl text-white flex-1"> <fa-icon [icon]="faVideo"></fa-icon> </object>
+        }
+    }
+    <!-- <div class="col-span-1 max-w-[300px]">
+        
+        
+        <div class="flex justify-center items-center text-center bg-primary-950 text-white font-cairo-semibold text-xl py-4 overflow-hidden">
+            <h1 class="font-bold text-center overflow-hidden text-wrap max-w-[200px] md:max-w-[350px] lg:md:max-w-[550px]">{{ work.title }}</h1>
+        </div>
+        
+        @if (work.toolsIds !== undefined && work.toolsIds.length > 0) {
+            <div class="flex justify-center items-center text-center gap-1 bg-primary-400 py-3 flex-wrap">
+                @for (tool of toolsStore.GetToolsForWork(work.toolsIds) ; track $index) {
+                    <img [src]="tool.publicToolImageUrl" alt="" class="max-w-[30px]">
+                }
+            </div>
+        }
+        
+    </div> -->
+}
