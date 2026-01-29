@@ -17,6 +17,8 @@ export async function data() {
     title: `${moviesData.length} Star Wars Movies`,
   });
 
+  console.log("thhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh from starwars");
+
   // We remove data we don't need because the data is passed to the client; we should
   // minimize what is sent over the network.
   const movies = minimize(moviesData);

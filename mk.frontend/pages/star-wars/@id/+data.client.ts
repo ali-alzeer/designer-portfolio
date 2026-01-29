@@ -13,6 +13,8 @@ export async function data(pageContext: PageContextServer) {
   const response = await fetch(`https://brillout.github.io/star-wars/api/films/${pageContext.routeParams.id}.json`);
   let movie = (await response.json()) as MovieDetails;
 
+  console.log(movie.title);
+
   config({
     // Set <title>
     title: movie.title,
