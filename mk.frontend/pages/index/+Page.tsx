@@ -1,16 +1,6 @@
-import { Counter } from "./Counter.js";
+// import MainPage from "./Main.js";
+import Portfolio from "./Main4.js";
 
 export default function Page() {
-  return (
-    <>
-      <h1>My Vike app</h1>
-      <p>This page is:</p>
-      <ul>
-        <li>Rendered to HTML.</li>
-        <li>
-          Interactive. <Counter />
-        </li>
-      </ul>
-    </>
-  );
+  return <Portfolio />;
 }

@@ -27,3 +27,13 @@ body {
 body.page-transition #page-content {
   opacity: 0;
 }
+
+/* Fonts */
+@font-face {
+  font-family: "tajawal";
+  src: url("../assets/fonts/tajawal/Tajawal-Black.ttf");
+}
+* {
+  font-family: "tajawal";
+  z-index: 2;
+}
