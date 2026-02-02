@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "CYkLkd2ZAxI=",
+  "success": true,
+  "projectFilePath": "E:\\programming2\\ProgrammingCourses\\WebCoursesBeforeJob\\28_MK_PORTFOLIO_V2\\designer-portfolio\\mk.backend\\mk.backend.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Ali\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.2\\microsoft.aspnetcore.openapi.10.0.2.nupkg.sha512",
+    "C:\\Users\\Ali\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
