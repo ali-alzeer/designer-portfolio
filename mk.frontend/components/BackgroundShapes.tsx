@@ -93,7 +93,7 @@ const BackgroundCanvas = ({ theme }: { theme: "dark" | "light" }) => {
         position: "fixed",
         top: 0,
         left: 0,
-        zIndex: 1, // Stay behind your content
+        zIndex: -1,
         pointerEvents: "none", // Don't block clicks
       }}
     />

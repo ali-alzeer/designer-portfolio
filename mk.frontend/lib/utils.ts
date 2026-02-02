@@ -53,14 +53,23 @@ export function convertToEmbedUrl(urlString: string): string | null {
   return null; // Return null if unable to parse a valid video ID
 }
 
-// --- Example Usage ---
+import { useState, useEffect } from "react";
 
-const standardUrl = "https://www.youtube.com";
-const shortUrl = "https://youtu.be";
-const alreadyEmbedUrl = "https://www.youtube.com";
-const invalidUrl = "https://www.google.com";
+export const useIsMobile = (breakpoint: number = 768) => {
+  const [isMobile, setIsMobile] = useState(false);
 
-console.log(`Standard URL: ${convertToEmbedUrl(standardUrl)}`);
-console.log(`Short URL: ${convertToEmbedUrl(shortUrl)}`);
-console.log(`Already Embed URL: ${convertToEmbedUrl(alreadyEmbedUrl)}`);
-console.log(`Invalid URL: ${convertToEmbedUrl(invalidUrl)}`);
+  useEffect(() => {
+    const checkSize = () => {
+      setIsMobile(window.innerWidth <= breakpoint);
+    };
+
+    // Check on mount
+    checkSize();
+
+    // Listen for resize
+    window.addEventListener("resize", checkSize);
+    return () => window.removeEventListener("resize", checkSize);
+  }, [breakpoint]);
+
+  return isMobile;
+};

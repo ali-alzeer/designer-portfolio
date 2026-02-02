@@ -5,5 +5,6 @@ export default {
   title: "Mohammad Alkhaled",
   description: "Designer Mohammad Alkhaled portfolio",
   prerender: true,
+  clientRouting: true,
   extends: [vikeReact],
 } satisfies Config;

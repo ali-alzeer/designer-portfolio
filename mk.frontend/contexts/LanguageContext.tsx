@@ -8,7 +8,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { initReactI18next } from "react-i18next";
 import i18n from "i18next";
-import Loading from "@/components/Loading";
 
 // --- TYPES ---
 type Language = "en" | "ar";
@@ -34,6 +33,20 @@ const resources = {
       work: {
         title: "Portfolio",
       },
+      pagination: {
+        previous: "Previous",
+        next: "Next",
+      },
+      loading: {
+        loading: "LOADING",
+        ready: "READY",
+      },
+      details: {
+        back: "BACK",
+        details: "Details",
+        date: "Date",
+        tools: "Tools",
+      },
     },
   },
   ar: {
@@ -50,6 +63,20 @@ const resources = {
       },
       work: {
         title: "معرض الأعمال",
+      },
+      pagination: {
+        previous: "السابقة",
+        next: "التالية",
+      },
+      loading: {
+        loading: "تحميل",
+        ready: "جاهز",
+      },
+      details: {
+        back: "رجوع",
+        details: "التفاصيل",
+        date: "التاريخ",
+        tools: "الأدوات",
       },
     },
   },
@@ -70,35 +97,41 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const { i18n: i18nInstance } = useTranslation();
   const [language, setLanguage] = useState<Language>("ar");
   const [mounted, setMounted] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const toggleLanguage = () => {
-    i18nInstance.changeLanguage(language === "ar" ? "en" : "ar");
-    setLanguage((prev) => (prev === "ar" ? "en" : "ar"));
+    const newLang = language === "ar" ? "en" : "ar";
+    i18nInstance.changeLanguage(newLang);
+    setLanguage(newLang);
   };
 
   useEffect(() => {
+    // 1. Check LocalStorage
     const savedLanguage = localStorage.getItem(
       "portfolio-language",
     ) as Language;
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
-      i18nInstance.changeLanguage(savedLanguage);
-    }
+
+    // 2. Check Browser Language if no LocalStorage
+    const browserLang = navigator.language.startsWith("ar") ? "ar" : "en";
+
+    // Final determination
+    const initialLang = savedLanguage || browserLang;
+
+    setLanguage(initialLang);
+    i18nInstance.changeLanguage(initialLang);
     setMounted(true);
-    setLoading(false);
   }, []);
 
   useEffect(() => {
     if (mounted) {
       document.dir = language === "ar" ? "rtl" : "ltr";
+      document.documentElement.lang = language;
       localStorage.setItem("portfolio-language", language);
     }
   }, [language, mounted]);
 
   return (
     <LanguageContext.Provider value={{ language, toggleLanguage }}>
-      {loading ? <Loading /> : children}
+      {children}
     </LanguageContext.Provider>
   );
 };

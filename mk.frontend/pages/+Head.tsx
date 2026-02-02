@@ -6,7 +6,7 @@ export function Head() {
       <link
         rel="preload"
         as="image"
-        href="https://res.cloudinary.com/dwrnygn0d/image/upload/v1731421077/mainimagemk-min_mrhpp8.png"
+        href="https://images.unsplash.com/photo-1449034446853-66c86144b0ad?auto=format&q=80&w=800"
       />
     </>
   );
