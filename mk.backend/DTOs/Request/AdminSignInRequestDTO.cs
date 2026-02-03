@@ -1,6 +1,6 @@
 ﻿namespace mk.backend.DTOs.Request
 {
-  public class AdminSignInDTO
+  public class AdminSignInRequestDTO
   {
     public string Password { get; set; } = string.Empty;
   }
