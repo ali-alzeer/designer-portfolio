@@ -50,6 +50,7 @@ namespace mk.backend.BaseController
     [HttpPut("{id}")]
     public virtual async Task<ActionResult<ApiResponse<object>>> Update(string id, TDto dto)
     {
+      _ = await _service.GetByIdAsync(id) ?? throw new KeyNotFoundException("Item not found.");
       await _service.UpdateAsync(id, dto);
       return Ok(ApiResponse<object>.SuccessResponse(null, "Updated successfully"));
     }
@@ -57,6 +58,7 @@ namespace mk.backend.BaseController
     [HttpDelete("{id}")]
     public virtual async Task<ActionResult<ApiResponse<object>>> Delete(string id)
     {
+      _ = await _service.GetByIdAsync(id) ?? throw new KeyNotFoundException("Item not found.");
       await _service.DeleteAsync(id);
       return Ok(ApiResponse<object>.SuccessResponse(null, "Deleted successfully"));
     }

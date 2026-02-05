@@ -1,0 +1,108 @@
+{
+  "sections": [
+    {
+      "id": "work",
+      "endpoint": "Works",
+      "labelKey": "admin.dashboard.works",
+      "fields": [
+        {
+          "name": "titleAr",
+          "label": "admin.dashboard.titleAr",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "titleEn",
+          "label": "admin.dashboard.titleEn",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "publicWorkMediaUrl",
+          "label": "admin.dashboard.url",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "descriptionAr",
+          "label": "admin.dashboard.descriptionAr",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "name": "descriptionEn",
+          "label": "admin.dashboard.descriptionEn",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "name": "type",
+          "label": "admin.dashboard.type",
+          "type": "custom",
+          "customKey": "workTypeRadio"
+        },
+        {
+          "name": "toolsIds",
+          "label": "admin.dashboard.tools",
+          "type": "custom",
+          "customKey": "toolMultiSelect",
+          "gridFull": true
+        }
+      ]
+    },
+    {
+      "id": "tool",
+      "endpoint": "Tools",
+      "labelKey": "admin.dashboard.tools",
+      "fields": [
+        {
+          "name": "title",
+          "label": "admin.dashboard.title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "publicToolImageUrl",
+          "label": "admin.dashboard.icon",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "endpoint": "ContactInfo",
+      "labelKey": "admin.dashboard.contact",
+      "fields": [
+        {
+          "name": "titleAr",
+          "label": "admin.dashboard.titleAr",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "titleEn",
+          "label": "admin.dashboard.titleEn",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "url",
+          "label": "admin.dashboard.url",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "icon",
+          "label": "admin.dashboard.icon",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "profile",
+      "labelKey": "admin.dashboard.profile"
+    }
+  ]
+}

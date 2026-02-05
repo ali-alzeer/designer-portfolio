@@ -28,6 +28,6 @@ namespace mk.backend.DTOs.Request
     [MinLength(1, ErrorMessage = "PublicWorkMediaUrl cannot be empty")]
     [MaxLength(500)]
     public string PublicWorkMediaUrl { get; set; } = string.Empty;
-    public List<int> ToolsIds { get; set; } = [];
+    public List<string> ToolsIds { get; set; } = [];
   }
 }

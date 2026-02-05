@@ -13,39 +13,52 @@ namespace mk.backend.Controllers
   {
     [EnableRateLimiting("loginPolicy")]
     [HttpPost("signin")]
-    public async Task<ActionResult<ApiResponse<AdminResponseDTO>>> Login([FromBody] AdminSignInRequestDTO dto)
+    public async Task<ActionResult<ApiResponse<TokenResponseDTO>>> Login([FromBody] AdminSignInRequestDTO dto)
     {
       // Pass 'Response' so the service can attach the cookie
       var result = await authService.SignInAsync(dto, Response);
       return Ok(result);
     }
 
-    [Authorize]
     [HttpPost("refresh")]
-    public async Task<ActionResult<ApiResponse<AdminResponseDTO>>> Refresh([FromBody] string expiredToken)
+    public async Task<ActionResult<ApiResponse<TokenResponseDTO>>> Refresh([FromBody] TokenRequestDTO dto)
     {
-      // Read the refresh token from the cookie instead of the request body
       var refreshToken = Request.Cookies["refreshToken"];
 
       if (string.IsNullOrEmpty(refreshToken))
         return Unauthorized(ApiResponse<object>.FailureResponse("Refresh token missing"));
 
-      var result = await authService.RefreshTokenAsync(expiredToken, refreshToken, Response);
+      var result = await authService.RefreshTokenAsync(dto.ExpiredToken, refreshToken, Response);
       return Ok(result);
     }
     [Authorize]
-    [HttpPut("update-profile")]
-    public async Task<ActionResult<ApiResponse<object>>> UpdateProfile([FromBody] AdminUpdateRequestDTO dto)
+    [HttpPut("update-image")]
+    public async Task<ActionResult<ApiResponse<object>>> UpdateImage([FromBody] MainImageUpdateRequestDTO dto)
     {
-      var result = await authService.UpdateAdminAsync(dto);
+      if (string.IsNullOrWhiteSpace(dto.MainImageUrl))
+      {
+        return BadRequest(ApiResponse<object>.FailureResponse("MainImageUrl field is required"));
+      }
+      var result = await authService.UpdateMainImageAsync(dto);
+      return Ok(result);
+    }
+    [Authorize]
+    [HttpPut("update-password")]
+    public async Task<ActionResult<ApiResponse<object>>> UpdatePassword([FromBody] PasswordUpdateRequestDTO dto)
+    {
+      if (string.IsNullOrWhiteSpace(dto.NewPassword) || string.IsNullOrWhiteSpace(dto.OldPassword))
+      {
+        return BadRequest(ApiResponse<object>.FailureResponse("Both Passwords cannot be empty"));
+      }
+      var result = await authService.UpdatePasswordAsync(dto);
       return Ok(result);
     }
 
     [Authorize]
     [HttpPost("signout")]
-    public IActionResult Logout()
+    public async Task<ActionResult<ApiResponse<object>>> Logout()
     {
-      Response.Cookies.Delete("refreshToken");
+      await authService.SignOutAsync(Response);
       return Ok(ApiResponse<object>.SuccessResponse(null, "Logged out successfully"));
     }
 

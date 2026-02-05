@@ -8,7 +8,6 @@ import PaginationControls from "@/components/PaginationControls";
 import WorkCard from "@/components/WorkCard";
 import { styles } from "@/styles/styles";
 import { useIsMobile } from "@/lib/utils";
-import Header from "@/components/Header";
 import { dummyWorks } from "@/data/dummyData";
 import { Work } from "@/types";
 
@@ -94,7 +93,7 @@ const Page = () => {
 
         setWorks(works);
         console.log(works);
-        console.log(import.meta.env.PUBLIC_ENV_BACKEND_URL);
+        console.log(import.meta.env.PUBLIC_ENV__BACKEND_URL);
         console.timeEnd("Root Data Fetch");
         // You may want to do setState here as well
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -120,10 +119,6 @@ const Page = () => {
       }}
     >
       <style>{globalCSS(colors)}</style>
-
-      {/* --- Navigation --- */}
-      <Header />
-
       {/* --- Hero Section --- */}
       <main style={styles.hero}>
         <div style={styles.visualStack}>

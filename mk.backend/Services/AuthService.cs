@@ -14,14 +14,16 @@ namespace mk.backend.Services
 {
   public interface IAuthService
   {
-    Task<ApiResponse<AdminResponseDTO>> SignInAsync(AdminSignInRequestDTO dto, HttpResponse response);
-    Task<ApiResponse<AdminResponseDTO>> RefreshTokenAsync(string expiredToken, string refreshToken, HttpResponse response);
-    Task<ApiResponse<object>> UpdateAdminAsync(AdminUpdateRequestDTO dto);
+    Task<ApiResponse<TokenResponseDTO>> SignInAsync(AdminSignInRequestDTO dto, HttpResponse response);
+    Task<ApiResponse<TokenResponseDTO>> RefreshTokenAsync(string expiredToken, string refreshToken, HttpResponse response);
+    Task<ApiResponse<object>> UpdateMainImageAsync(MainImageUpdateRequestDTO dto);
+    Task<ApiResponse<object>> UpdatePasswordAsync(PasswordUpdateRequestDTO dto);
     Task<ApiResponse<string>> GetMainImageUrlAsync();
+    Task<ApiResponse<object>> SignOutAsync(HttpResponse response);
   }
   public class AuthService(IAppDbContext context, IConfiguration config) : IAuthService
   {
-    public async Task<ApiResponse<AdminResponseDTO>> SignInAsync(AdminSignInRequestDTO dto, HttpResponse response)
+    public async Task<ApiResponse<TokenResponseDTO>> SignInAsync(AdminSignInRequestDTO dto, HttpResponse response)
     {
       var admin = await context.Set<Admin>().FirstOrDefaultAsync();
 
@@ -43,39 +45,48 @@ namespace mk.backend.Services
       // 3. Attach Refresh Token to HttpOnly Cookie
       SetRefreshTokenCookie(refreshToken, response);
 
-      var adminDto = new AdminResponseDTO
+      var tokenDto = new TokenResponseDTO
       {
-        Id = admin.Id,
-        MainImageUrl = admin.MainImageUrl,
-        LastLoginIn = admin.LastLoginIn,
-        Token = accessToken // Access token still goes in the body
+        Token = accessToken
       };
 
-      return ApiResponse<AdminResponseDTO>.SuccessResponse(adminDto, "Login successful");
+      return ApiResponse<TokenResponseDTO>.SuccessResponse(tokenDto, "Login successful");
     }
-    public async Task<ApiResponse<object>> UpdateAdminAsync(AdminUpdateRequestDTO dto)
+    public async Task<ApiResponse<object>> UpdateMainImageAsync(MainImageUpdateRequestDTO dto)
     {
-      var admin = await context.Set<Admin>().FirstOrDefaultAsync();
-      if (admin == null) throw new KeyNotFoundException("Admin not found.");
-
-      if (string.IsNullOrWhiteSpace(dto.MainImageUrl) || string.IsNullOrWhiteSpace(dto.NewPassword))
-        throw new InvalidOperationException("Main Image and Password are Required");
+      var admin = await context.Set<Admin>().FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Admin not found.");
+      if (string.IsNullOrWhiteSpace(dto.MainImageUrl))
+        throw new InvalidOperationException("Main Image is Required");
 
       admin.MainImageUrl = dto.MainImageUrl;
-      admin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
 
       admin.UpdatedAt = DateTime.UtcNow;
       await context.SaveChangesAsync();
 
-      return ApiResponse<object>.SuccessResponse(null, "Admin updated successfully");
+      return ApiResponse<object>.SuccessResponse(null, "MainImage updated successfully");
+    }
+    public async Task<ApiResponse<object>> UpdatePasswordAsync(PasswordUpdateRequestDTO dto)
+    {
+      var admin = await context.Set<Admin>().FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Admin not found.");
+      if (string.IsNullOrWhiteSpace(dto.OldPassword) || string.IsNullOrWhiteSpace(dto.NewPassword))
+        throw new InvalidOperationException("Passwords are Required");
+      if (!BC.Verify(dto.OldPassword, admin.PasswordHash))
+        throw new InvalidOperationException("Invalid Old Password");
+
+      admin.PasswordHash = BC.HashPassword(dto.NewPassword);
+
+      admin.UpdatedAt = DateTime.UtcNow;
+      await context.SaveChangesAsync();
+
+      return ApiResponse<object>.SuccessResponse(null, "Password updated successfully");
     }
     private void SetRefreshTokenCookie(string refreshToken, HttpResponse response)
     {
       var cookieOptions = new CookieOptions
       {
-        HttpOnly = true,   // Prevents JS access
-        Secure = true,     // Only sent over HTTPS
-        SameSite = SameSiteMode.Strict, // Prevents CSRF
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.None,
         Expires = DateTime.UtcNow.AddHours(double.Parse(config["JWT:REFRESH_TOKEN_LIFETIME_IN_HOURS"]!))
       };
       response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
@@ -85,7 +96,7 @@ namespace mk.backend.Services
       var adminMainImage = await context.Set<Admin>().Select(a => a.MainImageUrl).FirstOrDefaultAsync();
       return ApiResponse<string>.SuccessResponse(adminMainImage ?? string.Empty);
     }
-    public async Task<ApiResponse<AdminResponseDTO>> RefreshTokenAsync(string expiredToken, string refreshToken, HttpResponse response)
+    public async Task<ApiResponse<TokenResponseDTO>> RefreshTokenAsync(string expiredToken, string refreshToken, HttpResponse response)
     {
       var principal = GetPrincipalFromExpiredToken(expiredToken);
       var adminId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -109,13 +120,31 @@ namespace mk.backend.Services
       // 3. Overwrite the old cookie with the NEW refresh token
       SetRefreshTokenCookie(newRefreshToken, response);
 
-      return ApiResponse<AdminResponseDTO>.SuccessResponse(new AdminResponseDTO
+      return ApiResponse<TokenResponseDTO>.SuccessResponse(new TokenResponseDTO
       {
         Token = newAccessToken,
-        Id = admin.Id,
-        MainImageUrl = admin.MainImageUrl
       });
     }
+    public async Task<ApiResponse<object>> SignOutAsync(HttpResponse response)
+    {
+      var admin = await context.Set<Admin>().FirstOrDefaultAsync() ?? throw new UnauthorizedAccessException("Admin not found");
+
+      admin.RefreshToken = null;
+      admin.RefreshTokenExpiryTime = null;
+      await context.SaveChangesAsync();
+
+      var cookieOptions = new CookieOptions
+      {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.None,
+        Expires = DateTime.UtcNow.AddDays(-1)
+      };
+      response.Cookies.Append("refreshToken", "", cookieOptions);
+
+      return ApiResponse<object>.SuccessResponse(null, "Logout successful");
+    }
+
     private string GenerateRefreshToken()
     {
       var randomNumber = new byte[64];

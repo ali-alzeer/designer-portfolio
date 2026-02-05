@@ -5,7 +5,6 @@ import { dummyWorks } from "@/data/dummyData";
 import { Work } from "@/types";
 // import { useTranslation } from "react-i18next";
 import { usePageContext } from "vike-react/usePageContext";
-import Header from "@/components/Header";
 import { navigate } from "vike/client/router";
 import { useTranslation } from "react-i18next";
 import { convertToEmbedUrl } from "@/lib/utils";
@@ -94,7 +93,6 @@ const WorkDetail = () => {
 
   return (
     <>
-      <Header />
       <div
         style={{
           ...localStyles.container,

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using mk.backend.Data;
+using mk.backend.Models;
 
 namespace mk.backend.Services
 {
@@ -17,7 +18,7 @@ namespace mk.backend.Services
   }
 
   public class BaseService<T, TDto>(IAppDbContext context, IMapper mapper) : IBaseService<T, TDto>
-      where T : class
+      where T : BaseEntity
       where TDto : class
   {
     protected readonly IAppDbContext _context = context;
@@ -25,7 +26,7 @@ namespace mk.backend.Services
 
     public async Task<IEnumerable<T>> GetAllAsync()
     {
-      var entities = await _context.Set<T>().ToListAsync();
+      var entities = await _context.Set<T>().AsNoTracking().OrderByDescending(x => x.CreatedAt).ToListAsync();
       return _mapper.Map<IEnumerable<T>>(entities);
     }
 
@@ -62,6 +63,8 @@ namespace mk.backend.Services
     public async Task<IEnumerable<T>> GetAllPagedAsync(int page, int pageSize)
     {
       var entities = await _context.Set<T>()
+          .AsNoTracking()
+          .OrderByDescending(x => x.CreatedAt)
           .Skip((page - 1) * pageSize)
           .Take(pageSize)
           .ToListAsync();

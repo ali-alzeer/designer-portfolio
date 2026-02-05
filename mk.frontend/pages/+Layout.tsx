@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import BackgroundCanvas from "@/components/BackgroundShapes";
 import { useState } from "react";
 import Loading from "@/components/Loading";
+import Header from "@/components/Header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -17,31 +18,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {isLoading ? (
             <Loading onFinished={() => setIsLoading(false)} />
           ) : (
-            <div className="page-reveal">{children}</div>
+            <div className="page-reveal">
+              <Header />
+              {children}
+            </div>
           )}
         </LanguageProvider>
       </ThemeProvider>
     </>
   );
 }
-
-// // Layout.tsx
-// export default function Layout({ children }) {
-//   const [showLoader, setShowLoader] = useState(true);
-
-//   return (
-//     <ThemeProvider>
-//       <LanguageProvider>
-//         {showLoader ? (
-//           <Loading onFinished={() => setShowLoader(false)} />
-//         ) : (
-//           <div className="page-reveal">{children}</div>
-//         )}
-//       </LanguageProvider>
-
-//       <style>{`
-//
-//       `}</style>
-//     </ThemeProvider>
-//   );
-// }

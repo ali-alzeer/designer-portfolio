@@ -7,7 +7,6 @@ namespace mk.backend.DTOs.Request
 {
   public class TokenRequestDTO
   {
-    public string AccessToken { get; set; } = "";
-    public string RefreshToken { get; set; } = "";
+    public string ExpiredToken { get; set; } = "";
   }
 }

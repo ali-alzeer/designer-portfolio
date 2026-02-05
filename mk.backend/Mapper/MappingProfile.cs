@@ -12,7 +12,7 @@ namespace mk.backend.Mapper
       CreateMap<Work, WorkRequestDTO>().ReverseMap();
       CreateMap<Tool, ToolRequestDTO>().ReverseMap();
       CreateMap<ContactInfo, ContactInfoRequestDTO>().ReverseMap();
-      CreateMap<Admin, AdminResponseDTO>().ReverseMap();
+      CreateMap<Admin, TokenResponseDTO>().ReverseMap();
     }
   }
 }
