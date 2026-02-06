@@ -1,11 +1,31 @@
+import { useLanguage } from "@/contexts/LanguageContext";
 import { convertToEmbedUrl } from "@/lib/utils";
 import { styles } from "@/styles/styles";
 import { Work } from "@/types";
 import React from "react";
 import { navigate } from "vike/client/router";
+import DEFAULT_IMAGE_FOR_IMAGES from "../assets/default_image.webp";
+import DEFAULT_IMAGE_FOR_VIDEOS from "../assets/default_video.webp";
 
 const WorkCard = ({ work }: { work: Work }) => {
   const [isAssetLoading, setIsAssetLoading] = React.useState(true);
+  const [hasError, setHasError] = React.useState(false);
+  const { language } = useLanguage();
+
+  const displayUrl = hasError
+    ? work.type === "video"
+      ? DEFAULT_IMAGE_FOR_VIDEOS
+      : DEFAULT_IMAGE_FOR_IMAGES
+    : work.publicWorkMediaUrl;
+
+  const handleMediaLoad = () => {
+    setIsAssetLoading(false);
+  };
+
+  const handleMediaError = () => {
+    setHasError(true);
+    setIsAssetLoading(false);
+  };
 
   return (
     <div
@@ -15,7 +35,6 @@ const WorkCard = ({ work }: { work: Work }) => {
       className="card"
       style={{ position: "relative" }}
     >
-      {/* Skeleton Overlay: Only visible while asset is downloading */}
       {isAssetLoading && (
         <div
           style={{
@@ -32,26 +51,29 @@ const WorkCard = ({ work }: { work: Work }) => {
       )}
 
       <div style={{ visibility: isAssetLoading ? "hidden" : "visible" }}>
-        {work.type === "video" ? (
+        {work.type === "video" && !hasError ? (
           <div style={styles.cardImage}>
             <iframe
               style={{ width: "100%", height: "100%", border: "none" }}
-              src={convertToEmbedUrl(work.publicWorkMediaUrl) ?? ""}
-              onLoad={() => setIsAssetLoading(false)}
+              src={convertToEmbedUrl(displayUrl) ?? ""}
+              onLoad={handleMediaLoad}
+              onError={handleMediaError}
             />
           </div>
         ) : (
           <div
             style={{
               ...styles.cardImage,
-              backgroundImage: `url(${work.publicWorkMediaUrl})`,
+              backgroundImage: `url(${displayUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
           >
-            {/* Hidden img tag just to trigger the onLoad event */}
             <img
-              src={work.publicWorkMediaUrl}
+              src={displayUrl}
               style={{ display: "none" }}
-              onLoad={() => setIsAssetLoading(false)}
+              onLoad={handleMediaLoad}
+              onError={handleMediaError}
             />
             <div
               className="card-overlay"
@@ -61,7 +83,9 @@ const WorkCard = ({ work }: { work: Work }) => {
             ></div>
           </div>
         )}
-        <h3 style={styles.cardTitle}>{work.title}</h3>
+        <h3 style={styles.cardTitle}>
+          {language === "en" ? work.titleEn : work.titleAr}
+        </h3>
       </div>
     </div>
   );

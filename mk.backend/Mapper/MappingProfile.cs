@@ -10,7 +10,9 @@ namespace mk.backend.Mapper
     public MappingProfile()
     {
       CreateMap<Work, WorkRequestDTO>().ReverseMap();
+      CreateMap<Work, WorkResponseDTO>().ReverseMap();
       CreateMap<Tool, ToolRequestDTO>().ReverseMap();
+      CreateMap<Tool, ToolResponseDTO>().ReverseMap();
       CreateMap<ContactInfo, ContactInfoRequestDTO>().ReverseMap();
       CreateMap<Admin, TokenResponseDTO>().ReverseMap();
     }

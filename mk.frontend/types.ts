@@ -75,7 +75,11 @@ export interface Field {
   required?: boolean;
   placeholder?: string;
   styles?: React.CSSProperties;
-  renderCustom?: (value: any, onChange: (val: any) => void) => React.ReactNode;
+  renderCustom?: (
+    value: any,
+    onChange: (val: any) => void,
+    isReadOnly: boolean,
+  ) => React.ReactNode;
 }
 export interface DynamicFormProps {
   fields: Field[];
@@ -85,4 +89,12 @@ export interface DynamicFormProps {
   title: string;
   formLoading: boolean;
   formErrors: string[] | null;
+  isReadOnly: boolean;
+  formColor: string;
+  gridColumns: string;
+}
+
+export interface PageError {
+  statusCode: string;
+  errorMessage: string;
 }

@@ -15,3 +15,7 @@ export const ENDPOINT_WORKS = import.meta.env.PUBLIC_ENV__ENDPOINT_WORKS;
 export const ENDPOINT_TOOLS = import.meta.env.PUBLIC_ENV__ENDPOINT_TOOLS;
 export const ENDPOINT_CONTACTINFO = import.meta.env
   .PUBLIC_ENV__ENDPOINT_CONTACTINFO;
+
+export const ITEMS_PER_PAGE = 6;
+export const PAGES_PER_REQUEST = 5;
+export const ITEMS_PER_PAGE_INIT = ITEMS_PER_PAGE * PAGES_PER_REQUEST;

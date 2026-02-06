@@ -13,18 +13,21 @@ export function DynamicForm({
   title,
   formLoading,
   formErrors,
+  isReadOnly = false,
+  formColor = constColors.accent,
+  gridColumns = "3",
 }: DynamicFormProps) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState<any>(() => {
     const initialState = { ...initialData };
     fields.forEach((field) => {
       if (initialState[field.name] === undefined) {
-        // Use empty array for custom tools/checkboxes, empty string for others
         initialState[field.name] = field.type === "custom" ? [] : "";
       }
     });
     return initialState;
   });
+
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -37,34 +40,35 @@ export function DynamicForm({
 
     window.addEventListener("keydown", escape);
     return () => window.removeEventListener("keydown", escape);
-  }, []);
+  }, [onCancel]);
 
-  // Standard handler for native inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
+    if (isReadOnly) return; // Guard for read-only
     const { name, value } = e.target;
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
 
-  // Explicit handler for custom components
   const setFieldValue = (name: any, value: any) => {
+    if (isReadOnly) return; // Guard for read-only
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isReadOnly) return;
     onSubmit(formData);
   };
 
   return (
-    <div style={{ ...styles.overlay, flexDirection: "column" }}>
+    <div style={{ ...styles.overlay, flexDirection: "column", zIndex: 1000 }}>
       {formErrors ? (
         <div
           style={{
             ...styles.loginBox,
-            backgroundColor: theme === "dark" ? "#050505" : "#f9f9f9",
-            borderColor: "#ec0000",
+            backgroundColor: isDark ? "#050505" : "#f9f9f9",
+            borderColor: formColor,
             borderWidth: "2px",
             marginBottom: "10px",
             padding: "15px 25px",
@@ -79,15 +83,18 @@ export function DynamicForm({
           ))}
         </div>
       ) : null}
+
       <form
         onSubmit={handleSubmit}
         style={{
           ...styles.loginBox,
           backgroundColor: isDark ? "#111" : "#eee",
-          borderColor: constColors.accent,
+          borderColor: formColor,
           borderWidth: "2px",
           width: "90%",
           maxWidth: "800px",
+          maxHeight: "90vh",
+          overflowY: "auto",
         }}
       >
         {formLoading ? (
@@ -95,6 +102,7 @@ export function DynamicForm({
         ) : (
           <>
             <h3 style={{ fontSize: "25px", marginBottom: "20px" }}>{title}</h3>
+
             <div
               style={{
                 margin: "0",
@@ -102,41 +110,69 @@ export function DynamicForm({
                 display: "grid",
                 gap: "20px",
                 background: "none",
+                gridTemplateColumns: `repeat(${gridColumns}, 1fr)`,
               }}
             >
               {fields.map((field) => (
                 <div
                   key={field.name as string}
-                  style={
-                    field.styles
+                  style={{
+                    ...(field.styles
                       ? { ...styles.fieldGroup, ...field.styles }
-                      : styles.fieldGroup
-                  }
+                      : styles.fieldGroup),
+                    opacity: isReadOnly && field.type === "custom" ? 0.9 : 1,
+                  }}
                 >
                   <label style={styles.label}>{field.label}</label>
 
-                  {/* 1. Custom Render Strategy */}
+                  {/* 1. Custom Render Strategy (Updated to pass isReadOnly) */}
                   {field.renderCustom ? (
-                    field.renderCustom((formData as any)[field.name], (val) =>
-                      setFieldValue(field.name as any, val),
-                    )
-                  ) : /* 2. Textarea Strategy */
-                  field.type === "textarea" ? (
+                    <div
+                      style={{ pointerEvents: isReadOnly ? "none" : "auto" }}
+                    >
+                      {field.renderCustom(
+                        (formData as any)[field.name],
+                        (val) => setFieldValue(field.name as any, val),
+                        isReadOnly,
+                      )}
+                    </div>
+                  ) : field.type === "textarea" ? (
+                    /* 2. Textarea Strategy */
                     <textarea
                       name={field.name as string}
                       value={(formData as any)[field.name] || ""}
                       onChange={handleChange}
-                      style={styles.input}
+                      readOnly={isReadOnly}
+                      style={{
+                        ...styles.input,
+                        backgroundColor: isReadOnly
+                          ? isDark
+                            ? "#222"
+                            : "#ddd"
+                          : "inherit",
+                        cursor: isReadOnly ? "default" : "text",
+                        borderColor: isDark ? "#ddd" : "#222",
+                      }}
                       required={field.required}
                     />
                   ) : (
-                    /* 3. Default Input Strategy (Text, URL, Password) */
+                    /* 3. Default Input Strategy */
                     <input
                       type={field.type}
                       name={field.name as string}
                       value={(formData as any)[field.name] || ""}
                       onChange={handleChange}
-                      style={styles.input}
+                      readOnly={isReadOnly}
+                      style={{
+                        ...styles.input,
+                        backgroundColor: isReadOnly
+                          ? isDark
+                            ? "#222"
+                            : "#ddd"
+                          : "inherit",
+                        cursor: isReadOnly ? "default" : "text",
+                        borderColor: isDark ? "#ddd" : "#222",
+                      }}
                       required={field.required}
                       placeholder={field.placeholder}
                     />
@@ -146,12 +182,28 @@ export function DynamicForm({
             </div>
 
             <div style={styles.actions}>
-              <button type="button" onClick={onCancel} style={styles.cancelBtn}>
-                {t("admin.dashboard.cancel")}
+              <button
+                type="button"
+                onClick={onCancel}
+                style={{ ...styles.cancelBtn, borderColor: formColor }}
+              >
+                {isReadOnly
+                  ? t("admin.dashboard.close") || "Close"
+                  : t("admin.dashboard.cancel")}
               </button>
-              <button type="submit" style={styles.submitBtn}>
-                {t("admin.dashboard.save")}
-              </button>
+
+              {!isReadOnly && (
+                <button
+                  type="submit"
+                  style={{
+                    ...styles.submitBtn,
+                    backgroundColor: formColor,
+                    borderColor: formColor,
+                  }}
+                >
+                  {t("admin.dashboard.save")}
+                </button>
+              )}
             </div>
           </>
         )}

@@ -1,77 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/contexts/ThemeContext";
 
 import { useLanguage } from "@/contexts/LanguageContext";
 import PaginationControls from "@/components/PaginationControls";
 import WorkCard from "@/components/WorkCard";
-import { styles } from "@/styles/styles";
+import { constColors, styles } from "@/styles/styles";
 import { useIsMobile } from "@/lib/utils";
-import { dummyWorks } from "@/data/dummyData";
-import { Work } from "@/types";
-
-// --- Types ---
+import { ContactInfo, Work } from "@/types";
+import { publicApi } from "@/lib/api";
+import {
+  ENDPOINT_AUTH_MAINIMAGE,
+  ENDPOINT_CONTACTINFO,
+  ENDPOINT_WORKS,
+  ITEMS_PER_PAGE,
+  ITEMS_PER_PAGE_INIT,
+} from "@/constants/constants";
+import DEFAULT_IMAGE_FOR_DESIGNER from "@/assets/default_designer.webp";
 
 const Page = () => {
-  const [works, setWorks] = useState<Work[]>([]);
-
-  const ITEMS_PER_PAGE = 6;
-  const CLIENT_SIDE_THRESHOLD = 2; // Pages 1 & 2 are client-side
-
-  // State to hold all works we have fetched so far
-  const [allWorks, setAllWorks] = useState(
-    works.slice(0, ITEMS_PER_PAGE * CLIENT_SIDE_THRESHOLD),
-  );
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handlePageChange = async (targetPage: number) => {
-    const ITEMS_PER_PAGE = 6;
-    const FETCH_BATCH_SIZE = 60; // Fetch 10 pages worth of data at once
-
-    // 1. Check if the target page's data already exists in our state
-    // Example: Page 3 needs items at index 12-17.
-    // If allWorks.length is 12, we don't have it.
-    const startIndex = (targetPage - 1) * ITEMS_PER_PAGE;
-
-    if (allWorks.length > startIndex) {
-      setCurrentPage(targetPage);
-      return;
-    }
-
-    // 2. Fetch the next "Chunk" (the next 12 items)
-    setIsLoading(true);
-
-    // Simulate Network Latency
-    await new Promise((res) => setTimeout(res, 1500));
-
-    // Logic: Start slicing from where our current array ends
-    // and take the next 12 items (2 pages)
-    const nextBatchStart = allWorks.length;
-    const nextBatchEnd = allWorks.length + FETCH_BATCH_SIZE;
-
-    const backendItems = works.slice(nextBatchStart, nextBatchEnd);
-
-    // Update state: append new items and move to the target page
-    setAllWorks([...allWorks, ...backendItems]);
-    setCurrentPage(targetPage);
-    setIsLoading(false);
-  };
-
-  // Logic to get the 6 items for the current view
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const visibleWorks = allWorks.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { language } = useLanguage();
 
-  const isDark = theme === "dark";
+  const [mainImageUrl, setMaimImageUrl] = useState<string>(
+    DEFAULT_IMAGE_FOR_DESIGNER,
+  );
+
+  const handleMediaError = () => {
+    setMaimImageUrl(DEFAULT_IMAGE_FOR_DESIGNER);
+  };
 
   const IsMobile = useIsMobile();
-
-  // Dynamic Colors based on Context
+  const isDark = theme === "dark";
   const colors = {
     bg: isDark ? "#050505" : "#f9f9f9",
     text: isDark ? "#ffffff" : "#111111",
@@ -80,36 +42,106 @@ const Page = () => {
     accent: "#6366f1",
   };
 
-  useEffect(() => {
-    const callAPI1 = async () => {
-      try {
-        await new Promise((res) => setTimeout(res, 1000));
-        console.time("Root Data Fetch");
-        const works = dummyWorks.map((work) => ({
-          ...work,
-          createdOn: new Date(work.createdOn),
-          updatedOn: new Date(work.updatedOn),
-        }));
+  const [works, setWorks] = useState<Work[]>([]);
+  const [contactInfo, setContactInfo] = useState<ContactInfo[]>([]);
+  const [totalServerCount, setTotalServerCount] = useState(0);
 
-        setWorks(works);
-        console.log(works);
-        console.log(import.meta.env.PUBLIC_ENV__BACKEND_URL);
-        console.timeEnd("Root Data Fetch");
-        // You may want to do setState here as well
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
-        // do something when you encounter errors
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const visibleWorks = works.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const fetchCount = useCallback(async () => {
+    try {
+      const res = await publicApi.get(`${ENDPOINT_WORKS}/count`);
+      if (res.data.success) {
+        setTotalServerCount(res.data.data);
       }
-    };
-
-    callAPI1();
-
-    // RANDOM DATA
+    } catch (err) {
+      setTotalServerCount(0);
+      console.error("Failed to fetch count", err);
+    }
   }, []);
 
+  const fetchMainImage = useCallback(async () => {
+    try {
+      const res = await publicApi.get(ENDPOINT_AUTH_MAINIMAGE);
+      if (res.data.success) {
+        setMaimImageUrl(res.data.data);
+      }
+    } catch (err) {
+      setMaimImageUrl(DEFAULT_IMAGE_FOR_DESIGNER);
+      console.error("Failed to fetch main image", err);
+    }
+  }, []);
+
+  const fetchContactInfo = useCallback(async () => {
+    try {
+      const res = await publicApi.get(ENDPOINT_CONTACTINFO);
+      if (res.data.success) {
+        setContactInfo(res.data.data);
+      }
+    } catch (err) {
+      setContactInfo([]);
+      console.error("Failed to fetch main image", err);
+    }
+  }, []);
+
+  const handlePageChange = async (
+    targetPage: number,
+    isFirstFetch: boolean = false,
+  ) => {
+    if (isLoading) return;
+
+    const itemsNeeded = targetPage * ITEMS_PER_PAGE;
+
+    if (works.length >= itemsNeeded) {
+      setCurrentPage(targetPage);
+      return;
+    }
+
+    const skip = works.length;
+    let take = itemsNeeded - works.length;
+
+    if (isFirstFetch) {
+      take = ITEMS_PER_PAGE_INIT;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await publicApi.get(
+        `${ENDPOINT_WORKS}/paged?skip=${skip}&take=${take}`,
+      );
+
+      if (res.data.success) {
+        setWorks((prev) => {
+          const existingIds = new Set(prev.map((item) => item.id));
+
+          const uniqueNewItems = res.data.data.filter(
+            (newItem: any) => !existingIds.has(newItem.id),
+          );
+
+          return [...prev, ...uniqueNewItems];
+        });
+        setCurrentPage(targetPage);
+        setError(false);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setAllWorks(works.slice(0, ITEMS_PER_PAGE * CLIENT_SIDE_THRESHOLD));
-  }, [works]);
+    fetchMainImage();
+    fetchCount();
+    fetchContactInfo();
+    handlePageChange(1, true);
+  }, []);
 
   return (
     <div
@@ -166,7 +198,7 @@ const Page = () => {
             ...styles.heroTitle,
             fontSize:
               language === "en"
-                ? "clamp(3rem, 10vw, 6rem)"
+                ? "clamp(2rem, 10vw, 6rem)"
                 : "clamp(4rem, 12vw, 7rem)",
           }}
         >
@@ -183,7 +215,8 @@ const Page = () => {
         <div style={styles.aboutContent}>
           <div style={styles.imageContainer}>
             <img
-              src="https://images.unsplash.com/photo-1449034446853-66c86144b0ad?auto=format&q=80&w=800"
+              onError={handleMediaError}
+              src={mainImageUrl}
               alt="Me"
               style={styles.profileImg}
             />
@@ -196,53 +229,140 @@ const Page = () => {
             </p>
           </div>
         </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            textAlign: "center",
+            flexWrap: "wrap",
+            gap: "30px",
+          }}
+        >
+          {contactInfo.map((t) => {
+            return (
+              <a
+                style={{ marginTop: "40px" }}
+                key={t.id}
+                rel="noreferrer"
+                target="_blank"
+                href={t.url}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    background: "none",
+                    borderRadius: "5px",
+                    textAlign: "center",
+                    height: "110px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flex: 1,
+                    }}
+                  >
+                    <img width="50" height="50" src={t.icon} />
+                  </div>
+                  <div
+                    style={{
+                      height: "3rem",
+                      position: "relative",
+                    }}
+                  >
+                    <p
+                      style={{
+                        position: "absolute",
+                        left: "50%",
+                        transform: "translate(-50%, 0)",
+                        maxWidth: "80px",
+                        width: "80px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      {language === "en" ? t.titleEn : t.titleAr}
+                    </p>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
       </section>
       <section id="work" style={styles.workSection}>
         <div style={styles.filterHeader}>
           <h2 style={styles.sectionTitleCenter}>{t("work.title")}</h2>
         </div>
 
-        <div style={{ margin: "0 0 50px" }}>
-          <PaginationControls
-            currentPage={currentPage}
-            isLoading={isLoading}
-            itemsPerPage={ITEMS_PER_PAGE}
-            onPageChange={handlePageChange}
-            totalCount={works.length}
-          />
-        </div>
+        {error ? (
+          <p
+            style={{
+              border: `2px solid ${constColors.accent}`,
+              padding: "10px 20px",
+            }}
+          >
+            {t("error.serverError")}
+          </p>
+        ) : (
+          <>
+            {totalServerCount > 0 ? (
+              <div style={{ margin: "0 0 50px" }}>
+                <PaginationControls
+                  currentPage={currentPage}
+                  isLoading={isLoading}
+                  itemsPerPage={ITEMS_PER_PAGE}
+                  onPageChange={handlePageChange}
+                  totalCount={totalServerCount}
+                />
+              </div>
+            ) : null}
 
-        <div style={styles.grid}>
-          {isLoading
-            ? // Show 6 Skeletons while the "Backend" is fetching
-              Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-                <div key={i}>
-                  <div style={styles.skeletonStyleContainer} />
-                  <div style={styles.skeletonStyleTitle} />
+            <div
+              style={{
+                ...styles.grid,
+                gridTemplateColumns: IsMobile
+                  ? "1fr"
+                  : "repeat(auto-fill, minmax(350px, 1fr))",
+              }}
+            >
+              {isLoading
+                ? Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                    <div key={i}>
+                      <div style={styles.skeletonStyleContainer} />
+                      <div style={styles.skeletonStyleTitle} />
+                    </div>
+                  ))
+                : visibleWorks.map((work: Work) => (
+                    <WorkCard key={work.id} work={work} />
+                  ))}
+            </div>
+            {totalServerCount > 0 ? (
+              IsMobile ? (
+                <div style={{ margin: "50px 0 0" }}>
+                  <PaginationControls
+                    currentPage={currentPage}
+                    isLoading={isLoading}
+                    itemsPerPage={ITEMS_PER_PAGE}
+                    onPageChange={handlePageChange}
+                    totalCount={totalServerCount}
+                  />
                 </div>
-              ))
-            : // Show the real cards
-              visibleWorks.map((work) => (
-                <WorkCard key={work.id} work={work} />
-              ))}
-        </div>
-        {IsMobile ? (
-          <div style={{ margin: "50px 0 0" }}>
-            <PaginationControls
-              currentPage={currentPage}
-              isLoading={isLoading}
-              itemsPerPage={ITEMS_PER_PAGE}
-              onPageChange={handlePageChange}
-              totalCount={works.length}
-            />
-          </div>
-        ) : null}
+              ) : null
+            ) : null}
+          </>
+        )}
       </section>
       {/* --- Footer --- */}
       <footer
         style={{ ...styles.footer, borderTop: `1px solid ${colors.border}` }}
       >
-        <p>{t("hero.span")} © 2026</p>
+        <p>{t("footer.copyright1")}</p>
+        <p>{t("footer.copyright2")}</p>
       </footer>
     </div>
   );

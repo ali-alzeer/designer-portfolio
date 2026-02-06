@@ -1,35 +1,15 @@
-import { constColors, styles } from "@/styles/styles";
+import ErrorPage from "@/components/ErrorPage";
 import { useTranslation } from "react-i18next";
 import { usePageContext } from "vike-react/usePageContext";
-import { navigate } from "vike/client/router";
 
 export default function Page() {
   const { is404 } = usePageContext();
   const { t } = useTranslation();
   if (is404) {
     return (
-      <div style={styles.errorPageContainer}>
-        <h1 style={styles.errorPageCode}>404</h1>
-        <p>{t("error.pageNotFound")}</p>
-        <button
-          onClick={() => navigate("/")}
-          style={{ ...styles.button, backgroundColor: constColors.accent }}
-        >
-          {t("error.backToMain")}
-        </button>
-      </div>
+      <ErrorPage statusCode="404" errorMessage={t("error.pageNotFound")} />
     );
+  } else {
+    return <ErrorPage statusCode="500" errorMessage={t("error.serverError")} />;
   }
-  return (
-    <div style={styles.errorPageContainer}>
-      <h1 style={styles.errorPageCode}>500</h1>
-      <p>{t("error.serverError")}</p>
-      <button
-        onClick={() => navigate("/")}
-        style={{ ...styles.button, backgroundColor: constColors.accent }}
-      >
-        {t("error.backToMain")}
-      </button>
-    </div>
-  );
 }

@@ -17,6 +17,7 @@ import {
   ENDPOINT_AUTH_UPDATEPASSWORD,
   ENDPOINT_TOOLS,
 } from "@/constants/constants";
+import { convertToEmbedUrl } from "@/lib/utils";
 
 const Page = () => {
   const { t } = useTranslation();
@@ -43,8 +44,19 @@ const Page = () => {
     "MAINIMAGE",
   );
 
-  const isDark = theme === "dark";
+  const [formMode, setFormMode] = useState<"ADD" | "EDIT" | "VIEW">("ADD");
+  const [formEntity, setFormEntity] = useState<any>(null);
 
+  const isReadOnly = formMode === "VIEW";
+  const isDark = theme === "dark";
+  const formColorTab =
+    formMode === "ADD"
+      ? constColors.green
+      : formMode === "EDIT"
+        ? constColors.orange
+        : formMode === "VIEW"
+          ? constColors.blue
+          : constColors.accent;
   // Dynamic Colors based on Context
   const colors = {
     bg: isDark ? "#050505" : "#f9f9f9",
@@ -185,16 +197,20 @@ const Page = () => {
               style={{
                 cursor: "pointer",
                 padding: "10px",
-                backgroundColor: constColors.accent,
+                backgroundColor: formColorTab,
                 borderRadius: "5px",
+                color: "white",
               }}
             >
               <input
                 type="radio"
                 checked={value === opt}
-                onChange={() => onChange(opt)}
+                onChange={() => {
+                  if (isReadOnly) return;
+                  onChange(opt);
+                }}
               />{" "}
-              {opt}
+              {t(`admin.dashboard.${opt}`)}
             </label>
           ))}
         </div>
@@ -216,7 +232,7 @@ const Page = () => {
               style={{
                 cursor: "pointer",
                 padding: "10px",
-                borderColor: constColors.accent,
+                borderColor: formColorTab,
                 borderWidth: "1px",
                 background: "none",
                 borderRadius: "5px",
@@ -225,13 +241,14 @@ const Page = () => {
               <input
                 type="checkbox"
                 checked={value?.includes(tool.id)}
-                onChange={() =>
+                onChange={() => {
+                  if (isReadOnly) return;
                   onChange(
                     value?.includes(tool.id)
                       ? value.filter((v) => v !== tool.id)
                       : [...value, tool.id],
-                  )
-                }
+                  );
+                }}
               />{" "}
               <img width="50" height="50" src={tool.publicToolImageUrl} />
               <p
@@ -294,7 +311,7 @@ const Page = () => {
         styles: f.gridFull ? { gridColumn: "1/4" } : undefined,
       }));
     }
-  }, [activeSection, t, allTools, editTarget]);
+  }, [activeSection, t, allTools, editTarget, formEntity]);
 
   const handleEditProfile = async (formData: any) => {
     if (!activeSection || activeTabId.toUpperCase() !== "PROFILE") return;
@@ -323,6 +340,7 @@ const Page = () => {
   };
   const handleAdd = async (formData: any) => {
     if (!activeSection) return;
+    setFormEntity(null);
     try {
       if (
         activeSection.endpoint.toUpperCase() === "WORKS" &&
@@ -337,6 +355,36 @@ const Page = () => {
         setFormLoading(() => false);
         setFormErrors(() => null);
         setIsModalOpen(() => false);
+        fetchTabData();
+      } else {
+        setFormErrors(() => result.data.errors ?? [result.data.message]);
+        setFormLoading(() => false);
+      }
+    } catch (error) {
+      setFormErrors(() => [t("error.serverError")]);
+      setFormLoading(() => false);
+    }
+  };
+  const handleEdit = async (formData: any) => {
+    if (!activeSection) return;
+    try {
+      if (
+        activeSection.endpoint.toUpperCase() === "WORKS" &&
+        (formData.type == false || typeof formData.type !== typeof "")
+      ) {
+        formData.type = "image";
+      }
+      setFormErrors(() => null);
+      setFormLoading(() => true);
+      const result = await adminApi.put(
+        `${activeSection.endpoint}/${formEntity.id}`,
+        formData,
+      );
+      if (result.data.success) {
+        setFormLoading(() => false);
+        setFormErrors(() => null);
+        setIsModalOpen(() => false);
+        setFormEntity(null);
         fetchTabData();
       } else {
         setFormErrors(() => result.data.errors ?? [result.data.message]);
@@ -491,13 +539,23 @@ const Page = () => {
         <header style={styles.header}>
           <h1>{t(activeSection?.labelKey)}</h1>
           {activeTabId.toUpperCase() !== "PROFILE" ? (
-            <button onClick={() => setIsModalOpen(true)} style={styles.addBtn}>
+            <button
+              onClick={() => {
+                setFormMode("ADD");
+                setFormEntity(null);
+                setIsModalOpen(true);
+              }}
+              style={{
+                ...styles.genericBtn,
+                backgroundColor: constColors.green,
+              }}
+            >
               + {t("admin.dashboard.add")}
             </button>
           ) : (
             <button
               onClick={() => handleLogout()}
-              style={{ ...styles.addBtn, backgroundColor: "#cc2222" }}
+              style={{ ...styles.genericBtn, backgroundColor: constColors.red }}
             >
               {t("admin.dashboard.logout")}
             </button>
@@ -555,7 +613,7 @@ const Page = () => {
                           borderRadius: "6px",
                           flexShrink: 0,
                         }}
-                        src={mainImageUrl ?? ""}
+                        src={mainImageUrl ?? undefined}
                         alt="Profile Image"
                       />
                     </div>
@@ -568,7 +626,7 @@ const Page = () => {
                           setIsModalOpen(() => true);
                         }}
                         style={{
-                          ...styles.addBtn,
+                          ...styles.genericBtn,
                           backgroundColor: constColors.accent,
                           margin: 0,
                           padding: "8px 16px",
@@ -628,7 +686,7 @@ const Page = () => {
                           setIsModalOpen(() => true);
                         }}
                         style={{
-                          ...styles.addBtn,
+                          ...styles.genericBtn,
                           backgroundColor: constColors.accent,
                           margin: 0,
                           padding: "8px 16px",
@@ -670,21 +728,34 @@ const Page = () => {
                       minWidth: 0,
                     }}
                   >
-                    <img
-                      width="45"
-                      height="45"
-                      style={{
-                        objectFit: "cover",
-                        borderRadius: "6px",
-                        flexShrink: 0,
-                      }}
-                      src={
-                        item.publicWorkMediaUrl ||
-                        item.publicToolImageUrl ||
-                        item.icon
-                      }
-                      alt=""
-                    />
+                    {item.type === "video" ? (
+                      <iframe
+                        width="45"
+                        height="45"
+                        style={{
+                          objectFit: "cover",
+                          borderRadius: "6px",
+                          flexShrink: 0,
+                        }}
+                        src={convertToEmbedUrl(item.publicWorkMediaUrl) ?? ""}
+                      />
+                    ) : (
+                      <img
+                        width="45"
+                        height="45"
+                        style={{
+                          objectFit: "cover",
+                          borderRadius: "6px",
+                          flexShrink: 0,
+                        }}
+                        src={
+                          item.publicWorkMediaUrl ||
+                          item.publicToolImageUrl ||
+                          item.icon
+                        }
+                        alt=""
+                      />
+                    )}
 
                     {/* Text Wrapper */}
                     <p
@@ -692,7 +763,7 @@ const Page = () => {
                         margin: 0,
                         fontSize: "16px",
                         fontWeight: "500",
-                        color: isDark ? "#eee" : "#333",
+                        color: isDark ? "#eee" : "#111",
                         overflow: "hidden",
                         whiteSpace: "nowrap",
                         textOverflow: "ellipsis",
@@ -707,25 +778,42 @@ const Page = () => {
 
                   {/* RIGHT SECTION: Buttons */}
                   <div style={{ flexShrink: 0 }}>
-                    {activeTabId.toUpperCase() === "WORK" ? (
-                      <button
-                        onClick={() => navigate(`/work/${item.id}`)}
-                        style={{
-                          ...styles.addBtn,
-                          backgroundColor: "#2222cc",
-                          margin: "0 10px",
-                          padding: "8px 16px",
-                        }}
-                      >
-                        {t("admin.dashboard.details")}
-                      </button>
-                    ) : null}
+                    <button
+                      onClick={() => {
+                        setFormMode("VIEW");
+                        setFormEntity(item);
+                        setIsModalOpen(true);
+                      }}
+                      style={{
+                        ...styles.genericBtn,
+                        backgroundColor: constColors.blue,
+                        margin: "0",
+                        padding: "8px 16px",
+                      }}
+                    >
+                      {t("admin.dashboard.details")}
+                    </button>
 
+                    <button
+                      onClick={() => {
+                        setFormMode("EDIT");
+                        setFormEntity(item);
+                        setIsModalOpen(() => true);
+                      }}
+                      style={{
+                        ...styles.genericBtn,
+                        backgroundColor: constColors.orange,
+                        margin: "0 10px",
+                        padding: "8px 16px",
+                      }}
+                    >
+                      {t("admin.dashboard.edit")}
+                    </button>
                     <button
                       onClick={() => handleDelete(item.id)}
                       style={{
-                        ...styles.addBtn,
-                        backgroundColor: "#cc2222",
+                        ...styles.genericBtn,
+                        backgroundColor: constColors.red,
                         margin: 0,
                         padding: "8px 16px",
                       }}
@@ -743,12 +831,17 @@ const Page = () => {
       {isModalOpen ? (
         activeTabId.toUpperCase() === "PROFILE" ? (
           <DynamicForm
+            gridColumns="1"
+            formColor={constColors.accent}
+            isReadOnly={false}
             formErrors={formErrors}
             formLoading={formLoading}
-            title={t("admin.dashboard.edit")}
+            title={t("admin.dashboard.editProfile")}
             fields={dynamicFields}
             onSubmit={handleEditProfile}
             onCancel={() => {
+              setFormMode("ADD");
+              setFormEntity(null);
               setIsModalOpen(false);
               setFormErrors(null);
               setFormLoading(false);
@@ -756,12 +849,39 @@ const Page = () => {
           />
         ) : (
           <DynamicForm
+            gridColumns={
+              activeTabId.toUpperCase() === "WORKS"
+                ? "3"
+                : activeTabId.toUpperCase() === "PROFILE"
+                  ? "1"
+                  : "2"
+            }
+            formColor={formColorTab}
+            isReadOnly={isReadOnly}
+            initialData={
+              formMode === "EDIT" || formMode === "VIEW"
+                ? {
+                    ...formEntity,
+                    toolsIds: formEntity.tools
+                      ? formEntity.tools.map((t: any) => t.id)
+                      : [],
+                  }
+                : null
+            }
             formErrors={formErrors}
             formLoading={formLoading}
-            title={t("admin.dashboard.add")}
+            title={t(`admin.dashboard.${formMode.toLowerCase()}`)}
             fields={dynamicFields}
-            onSubmit={handleAdd}
+            onSubmit={
+              formMode === "EDIT"
+                ? handleEdit
+                : formMode === "ADD"
+                  ? handleAdd
+                  : () => {}
+            }
             onCancel={() => {
+              setFormMode("ADD");
+              setFormEntity(null);
               setIsModalOpen(false);
               setFormErrors(null);
               setFormLoading(false);

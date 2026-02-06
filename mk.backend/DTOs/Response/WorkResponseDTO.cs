@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using mk.backend.Models;
 
-namespace mk.backend.Models
+namespace mk.backend.DTOs.Response
 {
-  public class Work : BaseEntity
+  public class WorkResponseDTO : BaseEntity
   {
     [MaxLength(500)]
     public string TitleAr { get; set; } = string.Empty;
@@ -16,6 +17,6 @@ namespace mk.backend.Models
     public string Type { get; set; } = string.Empty;
     [MaxLength(500)]
     public string PublicWorkMediaUrl { get; set; } = string.Empty;
-    public List<Tool> Tools { get; set; } = [];
+    public List<ToolResponseDTO> Tools { get; set; } = [];
   }
 }

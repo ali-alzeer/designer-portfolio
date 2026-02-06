@@ -12,6 +12,7 @@ namespace mk.backend.Services
     Task<IEnumerable<T>> GetAllAsync();
     Task<IEnumerable<T>> GetAllPagedAsync(int page, int pageSize);
     Task<T> GetByIdAsync(string id);
+    Task<int> GetCountAsync();
     Task<T> AddAsync(TDto dto);
     Task UpdateAsync(string id, TDto dto);
     Task DeleteAsync(string id);
@@ -24,19 +25,36 @@ namespace mk.backend.Services
     protected readonly IAppDbContext _context = context;
     protected readonly IMapper _mapper = mapper;
 
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public virtual async Task<IEnumerable<T>> GetAllAsync()
     {
       var entities = await _context.Set<T>().AsNoTracking().OrderByDescending(x => x.CreatedAt).ToListAsync();
       return _mapper.Map<IEnumerable<T>>(entities);
     }
+    public virtual async Task<IEnumerable<T>> GetAllPagedAsync(int skip, int take)
+    {
+      skip = Math.Max(0, skip);
+      take = Math.Max(1, take);
+      var entities = await _context.Set<T>()
+          .AsNoTracking()
+          .OrderByDescending(x => x.CreatedAt)
+          .Skip(skip)
+          .Take(take)
+          .ToListAsync();
 
-    public async Task<T> GetByIdAsync(string id)
+      return _mapper.Map<IEnumerable<T>>(entities);
+    }
+    public virtual async Task<T> GetByIdAsync(string id)
     {
       var entity = await _context.Set<T>().FindAsync(id);
       return _mapper.Map<T>(entity);
     }
+    public virtual async Task<int> GetCountAsync()
+    {
+      return await _context.Set<T>().CountAsync();
+    }
 
-    public async Task<T> AddAsync(TDto dto)
+
+    public virtual async Task<T> AddAsync(TDto dto)
     {
       var entity = _mapper.Map<T>(dto);
       await _context.Set<T>().AddAsync(entity);
@@ -44,14 +62,14 @@ namespace mk.backend.Services
       return _mapper.Map<T>(entity);
     }
 
-    public async Task UpdateAsync(string id, TDto dto)
+    public virtual async Task UpdateAsync(string id, TDto dto)
     {
       var existing = await _context.Set<T>().FindAsync(id) ?? throw new KeyNotFoundException("Record not found.");
       _mapper.Map(dto, existing);
       await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(string id)
+    public virtual async Task DeleteAsync(string id)
     {
       var entity = await _context.Set<T>().FindAsync(id);
       if (entity != null)
@@ -60,16 +78,6 @@ namespace mk.backend.Services
         await _context.SaveChangesAsync();
       }
     }
-    public async Task<IEnumerable<T>> GetAllPagedAsync(int page, int pageSize)
-    {
-      var entities = await _context.Set<T>()
-          .AsNoTracking()
-          .OrderByDescending(x => x.CreatedAt)
-          .Skip((page - 1) * pageSize)
-          .Take(pageSize)
-          .ToListAsync();
 
-      return _mapper.Map<IEnumerable<T>>(entities);
-    }
   }
 }

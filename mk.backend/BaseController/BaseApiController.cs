@@ -25,9 +25,11 @@ namespace mk.backend.BaseController
 
     [AllowAnonymous]
     [HttpGet("paged")]
-    public virtual async Task<ActionResult<ApiResponse<IEnumerable<T>>>> GetPaged(int page = 1, int pageSize = 10)
+    public virtual async Task<ActionResult<ApiResponse<IEnumerable<T>>>> GetPaged(int skip, int take)
     {
-      var result = await _service.GetAllPagedAsync(page, pageSize);
+      skip = Math.Max(0, skip);
+      take = Math.Max(1, take);
+      var result = await _service.GetAllPagedAsync(skip, take);
       return Ok(ApiResponse<IEnumerable<T>>.SuccessResponse(result));
     }
 
@@ -61,6 +63,14 @@ namespace mk.backend.BaseController
       _ = await _service.GetByIdAsync(id) ?? throw new KeyNotFoundException("Item not found.");
       await _service.DeleteAsync(id);
       return Ok(ApiResponse<object>.SuccessResponse(null, "Deleted successfully"));
+    }
+
+    [AllowAnonymous]
+    [HttpGet("count")]
+    public async Task<ActionResult<ApiResponse<int>>> GetCount()
+    {
+      var count = await _service.GetCountAsync();
+      return Ok(ApiResponse<int>.SuccessResponse(count, "Count retrieved"));
     }
   }
 }

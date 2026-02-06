@@ -1,5 +1,9 @@
 export const constColors = {
   accent: "rgb(163, 0, 255)",
+  blue: "#2222cc",
+  green: "#27ae60",
+  orange: "#ff7711",
+  red: "#cc2222",
 };
 
 export const styles: { [key: string]: React.CSSProperties } = {
@@ -85,20 +89,26 @@ export const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: 700,
   },
   aboutSection: { padding: "10rem 10%" },
+  imageContainer: {
+    position: "relative",
+    display: "flex",
+  },
   aboutContent: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-    gap: "4rem",
-    alignItems: "center",
-  },
-  imageContainer: { position: "relative" },
-  profileImg: {
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    justifyItems: "center",
+    gap: "30px",
+    minWidth: 0,
     width: "100%",
-    height: "400px",
+  },
+  profileImg: {
     objectFit: "cover",
     borderRadius: "20px",
     zIndex: 2,
-    position: "relative",
+    minWidth: 0,
+    width: "100%",
+    maxWidth: "500px",
+    minHeight: "300px",
   },
   sectionTitle: {
     fontSize: "2rem",
@@ -112,7 +122,7 @@ export const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: 800,
     marginBottom: "1.5rem",
   },
-  p: { lineHeight: 1.8, fontSize: "1.1rem" },
+  p: { textWrap: "wrap", lineHeight: 1.8, fontSize: "1.1rem" },
   footer: {
     padding: "4rem",
     textAlign: "center",
@@ -120,7 +130,9 @@ export const styles: { [key: string]: React.CSSProperties } = {
     opacity: 0.5,
   },
 
-  workSection: { padding: "5rem 5%" },
+  workSection: {
+    padding: "5rem 5%",
+  },
   filterHeader: {
     display: "flex",
     justifyContent: "space-between",
@@ -151,6 +163,9 @@ export const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: "12px",
     position: "relative",
     overflow: "hidden",
+    width: "100%",
+    maxWidth: "100%",
+    minWidth: 0,
   },
   tag: {
     background: "#fff",
@@ -227,14 +242,13 @@ export const styles: { [key: string]: React.CSSProperties } = {
     alignItems: "center",
   },
   navBtn: {
-    background: "none",
     border: `1px solid ${constColors.accent}`,
     textAlign: "center",
     cursor: "pointer",
     padding: "10px",
   },
   activeNav: {
-    background: constColors.accent,
+    backgroundColor: constColors.accent,
     border: `1px solid ${constColors.accent}`,
     color: "#fff",
     textAlign: "center",
@@ -256,9 +270,8 @@ export const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: "8px",
     overflow: "hidden",
   },
-  addBtn: {
+  genericBtn: {
     padding: "10px 20px",
-    background: "#27ae60",
     color: "#fff",
     border: "none",
     borderRadius: "4px",
@@ -332,7 +345,7 @@ export const styles: { [key: string]: React.CSSProperties } = {
   },
   submitBtn: {
     padding: "8px 16px",
-    background: constColors.accent,
+    backgroundColor: constColors.accent,
     color: "#fff",
     border: "none",
     borderRadius: "4px",
