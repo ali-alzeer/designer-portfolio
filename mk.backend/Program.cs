@@ -33,6 +33,17 @@ builder.Services.AddScoped<IWorkService, WorkService>();
 builder.Services.AddScoped<IToolService, ToolService>();
 builder.Services.AddScoped<IContactInfoService, ContactInfoService>();
 builder.Services.AddOpenApi();
+builder.Services.AddCors(options =>
+{
+  options.AddPolicy(name: "AllowedOriginOnly",
+                    policy =>
+                    {
+                      policy.WithOrigins(FRONTEND__ALLOWED_ORIGIN)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                    });
+});
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -116,6 +127,7 @@ builder.Services.AddRateLimiter(options =>
   });
 });
 var app = builder.Build();
+app.UseCors("AllowedOriginOnly");
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
@@ -130,10 +142,6 @@ if (app.Environment.IsDevelopment())
   });
 }
 app.UseHttpsRedirection();
-app.UseCors(options =>
-{
-  options.WithOrigins([FRONTEND__ALLOWED_ORIGIN]).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-});
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
